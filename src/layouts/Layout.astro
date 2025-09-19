@@ -1,10 +1,13 @@
 ---
+import ThemeToggle from "../components/ThemeToggle.astro";
+
 interface Props {
   title: string;
   description?: string;
 }
 
-const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } = Astro.props;
+const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
+  Astro.props;
 ---
 
 <!doctype html>
@@ -14,17 +17,48 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
     <title>{title}</title>
     <style>
       :root {
+        /* Light theme */
         --color-bg: #fafafa;
         --color-text: #1a1a1a;
         --color-text-muted: #6b7280;
         --color-border: #e5e7eb;
         --color-accent: #2563eb;
         --color-accent-light: #3b82f6;
-        --font-sans: system-ui, -apple-system, sans-serif;
-        --font-mono: ui-monospace, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        --color-card-bg: #ffffff;
+        --color-code-bg: #f8fafc;
+        --color-success: #10b981;
+        --color-warning: #f59e0b;
+        --color-error: #ef4444;
+
+        /* Modern dev fonts */
+        --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+        --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code",
+          "Roboto Mono", Consolas, "Courier New", monospace;
+        --font-code: "JetBrains Mono", ui-monospace, monospace;
+      }
+
+      /* Dark theme */
+      :root.dark {
+        --color-bg: #0f172a;
+        --color-text: #f1f5f9;
+        --color-text-muted: #94a3b8;
+        --color-border: #334155;
+        --color-accent: #60a5fa;
+        --color-accent-light: #93c5fd;
+        --color-card-bg: #1e293b;
+        --color-code-bg: #1e293b;
+        --color-success: #34d399;
+        --color-warning: #fbbf24;
+        --color-error: #f87171;
       }
 
       * {
@@ -36,6 +70,9 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
       html {
         font-family: var(--font-sans);
         line-height: 1.6;
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
       }
 
       body {
@@ -44,6 +81,29 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
+      }
+
+      /* Typography improvements */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+      }
+
+      code,
+      pre {
+        font-family: var(--font-code);
+        font-feature-settings:
+          "liga" 1,
+          "calt" 1;
       }
 
       .container {
@@ -58,6 +118,8 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
         position: sticky;
         top: 0;
         z-index: 100;
+        backdrop-filter: blur(8px);
+        transition: all 0.3s ease;
       }
 
       .header-content {
@@ -65,13 +127,35 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
         justify-content: space-between;
         align-items: center;
         padding: 1rem 0;
+        gap: 2rem;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
       }
 
       .logo {
         font-size: 1.5rem;
         font-weight: 700;
+        font-family: var(--font-mono);
         color: var(--color-text);
         text-decoration: none;
+        transition:
+          color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .logo:hover {
+        color: var(--color-accent);
+        transform: translateY(-1px);
       }
 
       nav ul {
@@ -84,11 +168,33 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
         color: var(--color-text-muted);
         text-decoration: none;
         font-weight: 500;
-        transition: color 0.2s ease;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        position: relative;
       }
 
       nav a:hover {
         color: var(--color-accent);
+        background: var(--color-code-bg);
+        transform: translateY(-1px);
+      }
+
+      /* Add subtle animations */
+      nav a::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: var(--color-accent);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+      }
+
+      nav a:hover::before {
+        width: 80%;
       }
 
       main {
@@ -99,9 +205,52 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
       footer {
         border-top: 1px solid var(--color-border);
         padding: 2rem 0;
-        text-align: center;
+        background: var(--color-code-bg);
         color: var(--color-text-muted);
         font-size: 0.875rem;
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+      }
+
+      .footer-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .footer-author {
+        font-family: var(--font-mono);
+        color: var(--color-accent);
+        font-weight: 500;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+      }
+
+      .footer-links a {
+        color: var(--color-text-muted);
+        text-decoration: none;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .footer-links a:hover {
+        color: var(--color-accent);
+        background: var(--color-bg);
+        transform: translateY(-1px);
       }
 
       @media (max-width: 768px) {
@@ -110,8 +259,119 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
           gap: 1rem;
         }
 
-        nav ul {
+        .header-left {
+          flex-direction: column;
           gap: 1rem;
+          text-align: center;
+        }
+
+        nav ul {
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .footer-content {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .footer-links {
+          justify-content: center;
+        }
+      }
+
+      /* Global Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.8;
+          transform: scale(1.05);
+        }
+      }
+
+      /* Animation utility classes */
+      .animate-fade-in {
+        animation: fadeIn 0.6s ease-out;
+      }
+
+      .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      .animate-pulse {
+        animation: pulse 2s infinite;
+      }
+
+      .hover-lift {
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .hover-lift:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Card stack animation */
+      .card-stack > * {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      .card-stack > *:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .card-stack > *:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .card-stack > *:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .card-stack > *:nth-child(4) {
+        animation-delay: 0.4s;
+      }
+      .card-stack > *:nth-child(5) {
+        animation-delay: 0.5s;
+      }
+      .card-stack > *:nth-child(6) {
+        animation-delay: 0.6s;
+      }
+
+      /* Reduce motion for accessibility */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
         }
       }
     </style>
@@ -120,17 +380,22 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
     <header>
       <div class="container">
         <div class="header-content">
-          <a href="/" class="logo">Search Algorithms</a>
-          <nav>
-            <ul>
-              <li><a href="/">Inicio</a></li>
-              <li><a href="/secciones/introduccion">Introducción</a></li>
-              <li><a href="/secciones/no-informadas">No Informadas</a></li>
-              <li><a href="/secciones/informadas">Informadas</a></li>
-              <li><a href="/secciones/local">Local</a></li>
-              <li><a href="/secciones/adversaria">Adversaria</a></li>
-            </ul>
-          </nav>
+          <div class="header-left">
+            <a href="/" class="logo">🔍 Search Algorithms</a>
+            <nav>
+              <ul>
+                <li><a href="/">🏠 Inicio</a></li>
+                <li><a href="/secciones/introduccion">📚 Introducción</a></li>
+                <li><a href="/secciones/no-informadas">🌐 No Informadas</a></li>
+                <li><a href="/secciones/informadas">🎯 Informadas</a></li>
+                <li><a href="/secciones/local">⛰️ Local</a></li>
+                <li><a href="/secciones/adversaria">♟️ Adversaria</a></li>
+              </ul>
+            </nav>
+          </div>
+          <div class="header-right">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </header>
@@ -143,7 +408,65 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
 
     <footer>
       <div class="container">
-        <p>&copy; 2024 Search Algorithms. Sitio educativo sobre algoritmos de búsqueda.</p>
+        <div class="footer-content">
+          <div class="footer-info">
+            <div>&copy; 2025 Search Algorithms</div>
+            <div class="footer-author">Developed by Agustín Marquardt</div>
+          </div>
+          <div class="footer-links">
+            <a
+              href="https://github.com/marcui13"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                ></path>
+              </svg>
+              GitHub
+            </a>
+            <a
+              href="https://www.linkedin.com/in/agustin-marquardt-0015611b3/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                ></path>
+              </svg>
+              LinkedIn
+            </a>
+            <a
+              href="https://agustin-marquardt-portfolio.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                ></path>
+              </svg>
+              Portfolio
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   </body>

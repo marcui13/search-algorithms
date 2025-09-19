@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import AlgorithmVisualization from '../../components/AlgorithmVisualization.astro';
 import { algorithms, getAlgorithmById } from '../../data/algorithms';
 
 export function getStaticPaths() {
@@ -93,6 +94,12 @@ const relatedAlgorithms = algorithms
           <pre><code>{algorithm.content.pseudocode.trim()}</code></pre>
         </div>
       </section>
+
+      <!-- Interactive Visualization -->
+      <AlgorithmVisualization
+        algorithmId={algorithm.id}
+        title={algorithm.title}
+      />
 
       <!-- Analysis -->
       <section class="analysis-section">
