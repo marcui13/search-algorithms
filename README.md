@@ -115,31 +115,7 @@ El sitio está optimizado para múltiples dispositivos:
 
 El sitio está configurado para despliegue en:
 
-- **Netlify**: Despliegue automático desde Git
 - **Vercel**: Integración directa con Astro
-- **GitHub Pages**: Compilación y despliegue con Actions
-- **Cualquier CDN**: Archivos estáticos optimizados
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
-
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Para cambios importantes:
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -am 'Agrega nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
-
-## 📞 Contacto
-
-Para preguntas, sugerencias o reportar problemas, puedes:
-
-- Abrir un issue en GitHub
-- Contactar al equipo de desarrollo
 
 ---
 
