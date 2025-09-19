@@ -6,54 +6,700 @@ interface Props {
   height?: string;
 }
 
-const { algorithmId, title, width = "100%", height = "400px" } = Astro.props;
+const { algorithmId, title, width = "100%", height = "500px" } = Astro.props;
+
+// Only show visualization for BFS, DFS, and UCS
+const supportedAlgorithms = ['bfs', 'dfs', 'ucs'];
+const showVisualization = supportedAlgorithms.includes(algorithmId);
 ---
 
-<div class="visualization-container">
-  <div class="visualization-header">
-    <h3>🎬 {title} - Visualización Interactiva</h3>
-    <div class="coming-soon-badge">Próximamente</div>
-  </div>
-
-  <div class="visualization-placeholder" style={`width: ${width}; height: ${height};`}>
-    <div class="placeholder-content">
-      <div class="placeholder-icon">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="m12 1 0 6m0 6 0 6"></path>
-          <path d="m21 12-6 0m-6 0-6 0"></path>
-          <path d="m20.2 20.2-4.2-4.2m-3.6-3.6-4.2-4.2"></path>
-          <path d="m20.2 3.8-4.2 4.2m-3.6 3.6-4.2 4.2"></path>
-        </svg>
-      </div>
-
-      <h4>Animación Interactiva</h4>
-      <p>
-        Aquí podrás ver paso a paso cómo el algoritmo {title} explora
-        los nodos del grafo y encuentra la solución.
-      </p>
-
-      <div class="future-features">
-        <div class="feature-item">
-          <span class="feature-icon">▶️</span>
-          <span>Reproducción paso a paso</span>
+{showVisualization ? (
+  <div class="visualization-container">
+    <div class="visualization-header">
+      <h3>🎬 {title} - Interactive Visualization</h3>
+      <div class="controls">
+        <div class="control-group">
+          <label class="tree-control">
+            Levels:
+            <input type="number" id="levels-input" min="2" max="5" value="3" />
+          </label>
+          <label class="tree-control">
+            Branching:
+            <input type="number" id="branching-input" min="2" max="4" value="2" />
+          </label>
+          <label class="tree-control">
+            Goal Node:
+            <select id="goal-select">
+              <option value="auto">Auto (Last)</option>
+            </select>
+          </label>
         </div>
-        <div class="feature-item">
-          <span class="feature-icon">⏸️</span>
-          <span>Control de velocidad</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon">🎯</span>
-          <span>Comparación entre algoritmos</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon">📊</span>
-          <span>Métricas en tiempo real</span>
+        <div class="control-group">
+          <button id="generate-btn" class="control-btn secondary">🔧 Generate Tree</button>
+          <button id="play-btn" class="control-btn">▶️ Play</button>
+          <button id="pause-btn" class="control-btn" disabled>⏸️ Pause</button>
+          <button id="reset-btn" class="control-btn">🔄 Reset</button>
+          <label class="speed-control">
+            Speed:
+            <select id="speed-select">
+              <option value="500">Slow</option>
+              <option value="300" selected>Normal</option>
+              <option value="100">Fast</option>
+            </select>
+          </label>
         </div>
       </div>
     </div>
+
+    <div class="visualization-content" style={`width: ${width};`}>
+      <div class="graph-container" id="graph-container">
+        <svg id="graph-svg" width="100%" height="280">
+          <!-- Graph will be rendered here by JavaScript -->
+        </svg>
+      </div>
+
+      <div class="algorithm-info">
+        <div class="current-step">
+          <h4>Current Step:</h4>
+          <p id="step-description">Click play to start the algorithm visualization</p>
+        </div>
+
+        <div class="metrics">
+          <h4>Algorithm Metrics:</h4>
+          <div class="metric">
+            <span class="metric-label">Goal Node:</span>
+            <span id="goal-indicator" class="metric-value goal-highlight">-</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Nodes Visited:</span>
+            <span id="nodes-visited" class="metric-value">0</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Current Frontier:</span>
+            <span id="frontier-size" class="metric-value">0</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Path Length:</span>
+            <span id="path-length" class="metric-value">-</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Execution Time:</span>
+            <span id="execution-time" class="metric-value">0ms</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Memory Usage:</span>
+            <span id="memory-usage" class="metric-value">0 nodes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" is:inline define:vars={{ algorithmId, title }}>
+      // Algorithm visualization logic
+      class AlgorithmVisualizer {
+        constructor(algorithmType) {
+          this.algorithmType = algorithmType;
+          this.nodes = [];
+          this.edges = [];
+          this.svg = document.getElementById('graph-svg');
+          this.isRunning = false;
+          this.isPaused = false;
+          this.currentStep = 0;
+          this.steps = [];
+          this.speed = 300;
+          this.levels = 3;
+          this.branching = 2;
+          this.goalNode = 'auto';
+          this.startTime = 0;
+          this.maxFrontierSize = 0;
+
+          // Wait for container to be ready
+          setTimeout(() => {
+            this.initializeGraph();
+            this.setupControls();
+            this.generateSteps();
+          }, 100);
+        }
+
+        initializeGraph() {
+          this.generateTree();
+          this.renderGraph();
+        }
+
+        generateTree() {
+          this.nodes = [];
+          this.edges = [];
+
+          // Calculate dynamic dimensions based on screen size and levels
+          const container = document.getElementById('graph-container');
+          const containerWidth = container ? container.offsetWidth - 40 : 600; // Account for padding
+          const isMobile = window.innerWidth <= 768;
+          const baseHeight = isMobile ? 150 : 200;
+          const heightPerLevel = isMobile ? 50 : 70;
+          const svgHeight = baseHeight + (this.levels * heightPerLevel);
+          const svgWidth = Math.min(containerWidth, isMobile ? 500 : 800);
+          const levelHeight = svgHeight / (this.levels + 1);
+
+          // Update container and SVG height
+          this.updateContainerHeight(svgHeight, svgWidth);
+
+          // Generate alphabet labels
+          const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          let nodeIndex = 0;
+
+          // Create nodes level by level
+          for (let level = 0; level < this.levels; level++) {
+            const nodesInLevel = Math.pow(this.branching, level);
+            const levelWidth = svgWidth / (nodesInLevel + 1);
+
+            for (let nodeInLevel = 0; nodeInLevel < nodesInLevel; nodeInLevel++) {
+              if (nodeIndex >= alphabet.length) break;
+
+              const nodeId = alphabet[nodeIndex];
+              const x = levelWidth * (nodeInLevel + 1);
+              const y = levelHeight * (level + 1);
+              const cost = Math.floor(Math.random() * 5) + 1;
+
+              this.nodes.push({
+                id: nodeId,
+                x: x,
+                y: y,
+                cost: cost,
+                status: 'unvisited',
+                level: level,
+                indexInLevel: nodeInLevel
+              });
+
+              nodeIndex++;
+            }
+          }
+
+          // Create edges (parent to children)
+          for (let level = 0; level < this.levels - 1; level++) {
+            const currentLevelNodes = this.nodes.filter(n => n.level === level);
+            const nextLevelNodes = this.nodes.filter(n => n.level === level + 1);
+
+            currentLevelNodes.forEach((parentNode, parentIndex) => {
+              const startChildIndex = parentIndex * this.branching;
+              const endChildIndex = Math.min(startChildIndex + this.branching, nextLevelNodes.length);
+
+              for (let childIndex = startChildIndex; childIndex < endChildIndex; childIndex++) {
+                const childNode = nextLevelNodes[childIndex];
+                this.edges.push({
+                  from: parentNode.id,
+                  to: childNode.id,
+                  cost: childNode.cost
+                });
+              }
+            });
+          }
+
+          // Set root cost to 0
+          if (this.nodes.length > 0) {
+            this.nodes[0].cost = 0;
+          }
+
+          this.updateGoalSelect();
+          this.updateGoalIndicator();
+        }
+
+        updateContainerHeight(svgHeight, svgWidth) {
+          const container = document.getElementById('graph-container');
+          const svg = document.getElementById('graph-svg');
+
+          if (container && svg) {
+            container.style.minHeight = `${svgHeight + 40}px`;
+            svg.setAttribute('height', svgHeight);
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
+            svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+          }
+        }
+
+        updateGoalSelect() {
+          const goalSelect = document.getElementById('goal-select');
+          goalSelect.innerHTML = '<option value="auto">Auto (Last)</option>';
+
+          this.nodes.forEach(node => {
+            if (node.id !== 'A') { // Don't allow root as goal
+              const option = document.createElement('option');
+              option.value = node.id;
+              option.textContent = `Node ${node.id}`;
+              goalSelect.appendChild(option);
+            }
+          });
+        }
+
+        updateGoalIndicator() {
+          const goalNodeId = this.getGoalNode();
+          const goalIndicator = document.getElementById('goal-indicator');
+          if (goalIndicator) {
+            goalIndicator.textContent = goalNodeId;
+          }
+        }
+
+        renderGraph() {
+          this.svg.innerHTML = '';
+
+          // Render edges
+          this.edges.forEach(edge => {
+            const fromNode = this.nodes.find(n => n.id === edge.from);
+            const toNode = this.nodes.find(n => n.id === edge.to);
+
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromNode.x);
+            line.setAttribute('y1', fromNode.y);
+            line.setAttribute('x2', toNode.x);
+            line.setAttribute('y2', toNode.y);
+            line.setAttribute('stroke', 'var(--color-border)');
+            line.setAttribute('stroke-width', '2');
+            this.svg.appendChild(line);
+
+            // Add edge cost label
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', (fromNode.x + toNode.x) / 2);
+            text.setAttribute('y', (fromNode.y + toNode.y) / 2 - 5);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('font-size', window.innerWidth <= 768 ? '10' : '12');
+            text.setAttribute('fill', 'var(--color-text-muted)');
+            text.setAttribute('font-weight', 'bold');
+            text.textContent = edge.cost;
+            this.svg.appendChild(text);
+          });
+
+          // Render nodes
+          this.nodes.forEach(node => {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', node.x);
+            circle.setAttribute('cy', node.y);
+            circle.setAttribute('r', window.innerWidth <= 768 ? '15' : '20');
+            circle.setAttribute('fill', this.getNodeColor(node.status));
+            circle.setAttribute('stroke', 'var(--color-accent)');
+            circle.setAttribute('stroke-width', '2');
+            circle.setAttribute('id', `node-${node.id}`);
+            this.svg.appendChild(circle);
+
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', node.x);
+            text.setAttribute('y', node.y + (window.innerWidth <= 768 ? 4 : 5));
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('font-weight', 'bold');
+            text.setAttribute('font-size', window.innerWidth <= 768 ? '12' : '14');
+            text.setAttribute('fill', 'white');
+            text.textContent = node.id;
+            this.svg.appendChild(text);
+          });
+        }
+
+        getNodeColor(status) {
+          switch(status) {
+            case 'start': return 'var(--color-success)';
+            case 'goal': return 'var(--color-error)';
+            case 'visited': return 'var(--color-accent)';
+            case 'frontier': return 'var(--color-warning)';
+            case 'path': return 'var(--color-success)';
+            default: return 'var(--color-text-muted)';
+          }
+        }
+
+        generateSteps() {
+          // Generate algorithm-specific steps
+          this.steps = [];
+
+          switch(this.algorithmType) {
+            case 'bfs':
+              this.generateBFSSteps();
+              break;
+            case 'dfs':
+              this.generateDFSSteps();
+              break;
+            case 'ucs':
+              this.generateUCSSteps();
+              break;
+          }
+        }
+
+        generateBFSSteps() {
+          const goalNodeId = this.getGoalNode();
+          this.steps = [];
+
+          const queue = ['A'];
+          const visited = new Set();
+
+          this.steps.push({
+            action: 'start',
+            node: 'A',
+            description: 'Start BFS from root A',
+            frontier: []
+          });
+
+          while (queue.length > 0) {
+            const currentNode = queue.shift();
+
+            if (visited.has(currentNode)) continue;
+            visited.add(currentNode);
+
+            if (currentNode === goalNodeId) {
+              this.steps.push({
+                action: 'goal',
+                node: currentNode,
+                description: `Found goal node ${currentNode}! BFS explores level by level.`,
+                frontier: queue.slice()
+              });
+              break;
+            }
+
+            // Get children of current node
+            const children = this.edges
+              .filter(edge => edge.from === currentNode)
+              .map(edge => edge.to)
+              .filter(child => !visited.has(child));
+
+            children.forEach(child => {
+              if (!queue.includes(child)) {
+                queue.push(child);
+              }
+            });
+
+            this.steps.push({
+              action: 'visit',
+              node: currentNode,
+              description: `Visit ${currentNode}, add children to queue: ${children.join(', ')}`,
+              frontier: queue.slice()
+            });
+          }
+        }
+
+        generateDFSSteps() {
+          const goalNodeId = this.getGoalNode();
+          this.steps = [];
+
+          const stack = ['A'];
+          const visited = new Set();
+
+          this.steps.push({
+            action: 'start',
+            node: 'A',
+            description: 'Start DFS from root A',
+            frontier: []
+          });
+
+          while (stack.length > 0) {
+            const currentNode = stack.pop();
+
+            if (visited.has(currentNode)) continue;
+            visited.add(currentNode);
+
+            if (currentNode === goalNodeId) {
+              this.steps.push({
+                action: 'goal',
+                node: currentNode,
+                description: `Found goal node ${currentNode}! DFS goes deep quickly.`,
+                frontier: stack.slice()
+              });
+              break;
+            }
+
+            // Get children of current node (reverse order for stack)
+            const children = this.edges
+              .filter(edge => edge.from === currentNode)
+              .map(edge => edge.to)
+              .filter(child => !visited.has(child))
+              .reverse();
+
+            children.forEach(child => {
+              if (!stack.includes(child)) {
+                stack.push(child);
+              }
+            });
+
+            this.steps.push({
+              action: 'visit',
+              node: currentNode,
+              description: `Visit ${currentNode}, add children to stack: ${children.reverse().join(', ')}`,
+              frontier: stack.slice()
+            });
+          }
+        }
+
+        generateUCSSteps() {
+          const goalNodeId = this.getGoalNode();
+          this.steps = [];
+
+          const priorityQueue = [{ node: 'A', cost: 0, path: ['A'] }];
+          const visited = new Set();
+
+          this.steps.push({
+            action: 'start',
+            node: 'A',
+            description: 'Start UCS from root A (cost: 0)',
+            frontier: []
+          });
+
+          while (priorityQueue.length > 0) {
+            // Sort by cost (lowest first)
+            priorityQueue.sort((a, b) => a.cost - b.cost);
+            const current = priorityQueue.shift();
+
+            if (visited.has(current.node)) continue;
+            visited.add(current.node);
+
+            if (current.node === goalNodeId) {
+              this.steps.push({
+                action: 'goal',
+                node: current.node,
+                description: `Found goal ${current.node} with optimal cost ${current.cost}! UCS guarantees optimal solution.`,
+                frontier: priorityQueue.map(item => `${item.node}(${item.cost})`).slice(0, 5)
+              });
+              break;
+            }
+
+            // Get children of current node
+            const children = this.edges
+              .filter(edge => edge.from === current.node)
+              .filter(edge => !visited.has(edge.to));
+
+            children.forEach(edge => {
+              const newCost = current.cost + edge.cost;
+              const newPath = [...current.path, edge.to];
+
+              // Check if this path is better than existing ones
+              const existingIndex = priorityQueue.findIndex(item => item.node === edge.to);
+              if (existingIndex === -1 || priorityQueue[existingIndex].cost > newCost) {
+                if (existingIndex !== -1) {
+                  priorityQueue.splice(existingIndex, 1);
+                }
+                priorityQueue.push({ node: edge.to, cost: newCost, path: newPath });
+              }
+            });
+
+            this.steps.push({
+              action: 'visit',
+              node: current.node,
+              description: `Visit ${current.node} (cost: ${current.cost}), expand children with cumulative costs`,
+              frontier: priorityQueue.map(item => `${item.node}(${item.cost})`).slice(0, 5)
+            });
+          }
+        }
+
+        getGoalNode() {
+          if (this.goalNode === 'auto') {
+            // Return the last node (leaf with highest alphabetical order)
+            return this.nodes[this.nodes.length - 1]?.id || 'G';
+          }
+          return this.goalNode;
+        }
+
+        setupControls() {
+          document.getElementById('play-btn').addEventListener('click', () => this.play());
+          document.getElementById('pause-btn').addEventListener('click', () => this.pause());
+          document.getElementById('reset-btn').addEventListener('click', () => this.reset());
+          document.getElementById('generate-btn').addEventListener('click', () => this.regenerateTree());
+          document.getElementById('speed-select').addEventListener('change', (e) => {
+            this.speed = parseInt(e.target.value);
+          });
+
+          // Tree parameter controls
+          document.getElementById('levels-input').addEventListener('change', (e) => {
+            this.levels = parseInt(e.target.value);
+          });
+          document.getElementById('branching-input').addEventListener('change', (e) => {
+            this.branching = parseInt(e.target.value);
+          });
+          document.getElementById('goal-select').addEventListener('change', (e) => {
+            this.goalNode = e.target.value;
+            this.updateGoalIndicator();
+          });
+        }
+
+        regenerateTree() {
+          this.stop();
+          // Wait a frame for any layout changes
+          requestAnimationFrame(() => {
+            this.generateTree();
+            this.renderGraph();
+            this.generateSteps();
+            this.reset();
+          });
+        }
+
+        stop() {
+          this.isRunning = false;
+          this.isPaused = false;
+        }
+
+        async play() {
+          if (this.isPaused) {
+            this.isPaused = false;
+            this.updateButtons();
+            await this.continueAnimation();
+            return;
+          }
+
+          this.isRunning = true;
+          this.startTime = performance.now();
+          this.maxFrontierSize = 0;
+          this.updateButtons();
+
+          for (let i = this.currentStep; i < this.steps.length && this.isRunning; i++) {
+            this.currentStep = i;
+            await this.executeStep(this.steps[i]);
+
+            if (!this.isRunning) break;
+            await this.delay(this.speed);
+          }
+
+          this.isRunning = false;
+          this.updateButtons();
+        }
+
+        pause() {
+          this.isPaused = true;
+          this.isRunning = false;
+          this.updateButtons();
+        }
+
+        reset() {
+          this.isRunning = false;
+          this.isPaused = false;
+          this.currentStep = 0;
+          this.startTime = 0;
+          this.maxFrontierSize = 0;
+
+          // Reset all nodes
+          this.nodes.forEach(node => {
+            node.status = 'unvisited';
+          });
+
+          this.renderGraph();
+          this.updateMetrics(0, 0, '-', 0, 0);
+          document.getElementById('step-description').textContent = 'Click play to start the algorithm visualization';
+          this.updateButtons();
+        }
+
+        async executeStep(step) {
+          const node = this.nodes.find(n => n.id === step.node);
+
+          switch(step.action) {
+            case 'start':
+              node.status = 'start';
+              break;
+            case 'visit':
+              node.status = 'visited';
+              break;
+            case 'goal':
+              node.status = 'goal';
+              // Show success alert
+              this.showGoalAlert(step.node);
+              break;
+          }
+
+          this.renderGraph();
+          document.getElementById('step-description').textContent = step.description;
+
+          const visitedCount = this.nodes.filter(n => n.status === 'visited' || n.status === 'start').length;
+          const frontierSize = step.frontier ? step.frontier.length : 0;
+          const pathLength = step.action === 'goal' ? this.currentStep + 1 : '-';
+
+          // Track max frontier size for memory usage
+          if (frontierSize > this.maxFrontierSize) {
+            this.maxFrontierSize = frontierSize;
+          }
+
+          // Calculate execution time
+          const executionTime = this.startTime > 0 ? performance.now() - this.startTime : 0;
+
+          this.updateMetrics(visitedCount, frontierSize, pathLength, executionTime, this.maxFrontierSize);
+        }
+
+        updateMetrics(visited, frontier, pathLength, executionTime, memoryUsage) {
+          document.getElementById('nodes-visited').textContent = visited;
+          document.getElementById('frontier-size').textContent = frontier;
+          document.getElementById('path-length').textContent = pathLength;
+          document.getElementById('execution-time').textContent = `${Math.round(executionTime)}ms`;
+          document.getElementById('memory-usage').textContent = `${memoryUsage} nodes`;
+        }
+
+        showGoalAlert(goalNode) {
+          // Create custom alert modal
+          const alertModal = document.createElement('div');
+          alertModal.className = 'goal-alert-modal';
+          alertModal.innerHTML = `
+            <div class="goal-alert-content">
+              <div class="goal-alert-icon">🎯</div>
+              <h3>Goal Found!</h3>
+              <p>Successfully reached node <strong>${goalNode}</strong></p>
+              <div class="goal-alert-stats">
+                <span>Algorithm: ${this.algorithmType.toUpperCase()}</span>
+                <span>Steps: ${this.currentStep + 1}</span>
+                <span>Time: ${Math.round(performance.now() - this.startTime)}ms</span>
+              </div>
+              <button id="close-alert" class="goal-alert-close">Continue</button>
+            </div>
+          `;
+
+          document.body.appendChild(alertModal);
+
+          // Close alert
+          document.getElementById('close-alert').addEventListener('click', () => {
+            alertModal.remove();
+          });
+
+          // Auto close after 4 seconds
+          setTimeout(() => {
+            if (document.body.contains(alertModal)) {
+              alertModal.remove();
+            }
+          }, 4000);
+        }
+
+        updateButtons() {
+          const playBtn = document.getElementById('play-btn');
+          const pauseBtn = document.getElementById('pause-btn');
+
+          playBtn.disabled = this.isRunning;
+          pauseBtn.disabled = !this.isRunning;
+        }
+
+        delay(ms) {
+          return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async continueAnimation() {
+          // Continue from current step
+          await this.play();
+        }
+      }
+
+      // Initialize visualization when DOM is loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        new AlgorithmVisualizer(algorithmId);
+      });
+    </script>
   </div>
-</div>
+) : (
+  <div class="visualization-container">
+    <div class="visualization-header">
+      <h3>🎬 {title} - Visualización Interactiva</h3>
+      <div class="coming-soon-badge">Próximamente</div>
+    </div>
+    <div class="visualization-placeholder" style={`width: ${width}; height: ${height};`}>
+      <div class="placeholder-content">
+        <div class="placeholder-icon">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="m12 1 0 6m0 6 0 6"></path>
+            <path d="m21 12-6 0m-6 0-6 0"></path>
+            <path d="m20.2 20.2-4.2-4.2m-3.6-3.6-4.2-4.2"></path>
+            <path d="m20.2 3.8-4.2 4.2m-3.6 3.6-4.2 4.2"></path>
+          </svg>
+        </div>
+        <h4>Visualización Interactiva</h4>
+        <p>La visualización para este algoritmo estará disponible próximamente.</p>
+      </div>
+    </div>
+  </div>
+)}
 
 <style>
   .visualization-container {
@@ -77,8 +723,9 @@ const { algorithmId, title, width = "100%", height = "400px" } = Astro.props;
     border-bottom: 1px solid var(--color-border);
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     gap: 1rem;
+    flex-wrap: wrap;
   }
 
   .visualization-header h3 {
@@ -86,6 +733,513 @@ const { algorithmId, title, width = "100%", height = "400px" } = Astro.props;
     color: var(--color-text);
     font-size: 1.125rem;
     font-family: var(--font-mono);
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .control-btn {
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-sans);
+  }
+
+  .control-btn:hover:not(:disabled) {
+    background: var(--color-accent-light);
+    transform: translateY(-1px);
+  }
+
+  .control-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .control-btn.secondary {
+    background: var(--color-border);
+    color: var(--color-text);
+  }
+
+  .control-btn.secondary:hover:not(:disabled) {
+    background: var(--color-text-muted);
+    color: var(--color-bg);
+  }
+
+  .tree-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .tree-control input,
+  .tree-control select {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    width: 60px;
+    min-width: 60px;
+  }
+
+  .tree-control select {
+    width: 110px;
+    min-width: 110px;
+  }
+
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+  }
+
+  .speed-control select {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
+  }
+
+  .visualization-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .graph-container {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1rem;
+    min-height: 300px;
+    width: 100%;
+    max-width: 90%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .algorithm-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 94%;
+  }
+
+  .current-step {
+    background: var(--color-code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .current-step h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--color-accent);
+    font-size: 1rem;
+    font-family: var(--font-mono);
+  }
+
+  .current-step p {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .metrics {
+    background: var(--color-code-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .metrics h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--color-accent);
+    font-size: 1rem;
+    font-family: var(--font-mono);
+  }
+
+  .metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .metric:last-child {
+    border-bottom: none;
+  }
+
+  .metric-label {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+
+  .metric-value {
+    font-size: 0.875rem;
+    color: var(--color-accent);
+    font-weight: 600;
+    font-family: var(--font-mono);
+  }
+
+  .goal-highlight {
+    background: linear-gradient(135deg, var(--color-error), var(--color-warning));
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 700;
+    animation: goalPulse 2s infinite;
+  }
+
+  @keyframes goalPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+
+  /* Mobile Responsive Design */
+  @media (max-width: 768px) {
+    .visualization-header {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .visualization-header h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .controls {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .control-group {
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .control-group:first-child {
+      order: 2; /* Tree controls go second on mobile */
+    }
+
+    .control-group:last-child {
+      order: 1; /* Playback controls go first on mobile */
+    }
+
+    .control-btn {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+      min-width: 60px;
+    }
+
+    .tree-control {
+      font-size: 0.8rem;
+      gap: 0.25rem;
+    }
+
+    .tree-control input,
+    .tree-control select {
+      width: 50px;
+      min-width: 50px;
+      padding: 0.2rem 0.3rem;
+      font-size: 0.8rem;
+    }
+
+    .tree-control select {
+      width: 100px;
+      min-width: 100px;
+    }
+
+    .speed-control {
+      font-size: 0.8rem;
+    }
+
+    .speed-control select {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.3rem;
+    }
+
+    .visualization-content {
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    .graph-container {
+      padding: 0.5rem;
+      min-height: 200px !important;
+    }
+
+    .graph-container svg {
+      max-width: calc(100vw - 80px);
+      height: auto;
+    }
+
+    .current-step {
+      min-height: 60px;
+      padding: 0.75rem;
+    }
+
+    .current-step h4 {
+      font-size: 0.9rem;
+    }
+
+    .current-step p {
+      font-size: 0.8rem;
+      line-height: 1.3;
+    }
+
+    .metrics {
+      padding: 0.75rem;
+    }
+
+    .metrics h4 {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .metric {
+      padding: 0.4rem 0;
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+    }
+
+    .metric-value {
+      font-size: 0.8rem;
+    }
+
+    .goal-highlight {
+      padding: 0.2rem 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .placeholder-content {
+      padding: 1rem;
+    }
+
+    .placeholder-content h4 {
+      font-size: 1.2rem;
+    }
+
+    .placeholder-content p {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Small mobile devices (up to 480px) */
+  @media (max-width: 480px) {
+    .visualization-header {
+      padding: 0.75rem;
+    }
+
+    .visualization-header h3 {
+      font-size: 0.9rem;
+    }
+
+    .control-group {
+      gap: 0.25rem;
+      justify-content: space-around;
+    }
+
+    .control-btn {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+      min-width: 50px;
+    }
+
+    .tree-control {
+      font-size: 0.75rem;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .tree-control input,
+    .tree-control select {
+      width: 45px;
+      min-width: 45px;
+    }
+
+    .tree-control select {
+      width: 90px;
+      min-width: 90px;
+    }
+
+    .visualization-content {
+      padding: 0.75rem;
+    }
+
+    .current-step,
+    .metrics {
+      padding: 0.5rem;
+    }
+
+    .current-step h4,
+    .metrics h4 {
+      font-size: 0.85rem;
+    }
+
+    .current-step p,
+    .metric-label,
+    .metric-value {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Goal Alert Modal Styles */
+  .goal-alert-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: modalFadeIn 0.3s ease-out;
+  }
+
+  .goal-alert-content {
+    background: var(--color-card-bg);
+    border: 2px solid var(--color-accent);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+  }
+
+  .goal-alert-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: iconBounce 0.6s ease-out;
+  }
+
+  .goal-alert-content h3 {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .goal-alert-content p {
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .goal-alert-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+
+  .goal-alert-stats span {
+    background: var(--color-code-bg);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    border: 1px solid var(--color-border);
+  }
+
+  .goal-alert-close {
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-sans);
+  }
+
+  .goal-alert-close:hover {
+    background: var(--color-accent-light);
+    transform: translateY(-1px);
+  }
+
+  @keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-30px) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes iconBounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-10px);
+    }
+    60% {
+      transform: translateY(-5px);
+    }
   }
 
   .coming-soon-badge {
@@ -151,34 +1305,6 @@ const { algorithmId, title, width = "100%", height = "400px" } = Astro.props;
     margin-bottom: 2rem;
   }
 
-  .future-features {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-
-  .feature-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: var(--color-card-bg);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 0.875rem;
-    color: var(--color-text);
-    transition: all 0.2s ease;
-  }
-
-  .feature-item:hover {
-    border-color: var(--color-accent);
-    transform: translateY(-1px);
-  }
-
-  .feature-icon {
-    font-size: 1rem;
-  }
-
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
@@ -198,11 +1324,16 @@ const { algorithmId, title, width = "100%", height = "400px" } = Astro.props;
     .visualization-header {
       flex-direction: column;
       text-align: center;
-      gap: 0.5rem;
+      gap: 1rem;
     }
 
-    .future-features {
+    .controls {
+      justify-content: center;
+    }
+
+    .algorithm-info {
       grid-template-columns: 1fr;
+      gap: 1rem;
     }
 
     .placeholder-content {

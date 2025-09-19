@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from "../components/ThemeToggle.astro";
+import Navigation from "../components/Navigation.astro";
 
 interface Props {
   title: string;
@@ -24,6 +25,22 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
       rel="stylesheet"
     />
     <title>{title}</title>
+    <script>
+      // Prevent theme flashing by applying theme before page render
+      (function() {
+        const getThemePreference = () => {
+          if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+            return localStorage.getItem('theme');
+          }
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const theme = getThemePreference();
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
     <style>
       :root {
         /* Light theme */
@@ -158,44 +175,6 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
         transform: translateY(-1px);
       }
 
-      nav ul {
-        display: flex;
-        list-style: none;
-        gap: 2rem;
-      }
-
-      nav a {
-        color: var(--color-text-muted);
-        text-decoration: none;
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        transition: all 0.2s ease;
-        position: relative;
-      }
-
-      nav a:hover {
-        color: var(--color-accent);
-        background: var(--color-code-bg);
-        transform: translateY(-1px);
-      }
-
-      /* Add subtle animations */
-      nav a::before {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        width: 0;
-        height: 2px;
-        background: var(--color-accent);
-        transition: all 0.3s ease;
-        transform: translateX(-50%);
-      }
-
-      nav a:hover::before {
-        width: 80%;
-      }
 
       main {
         flex: 1;
@@ -265,11 +244,6 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
           text-align: center;
         }
 
-        nav ul {
-          gap: 0.5rem;
-          flex-wrap: wrap;
-          justify-content: center;
-        }
 
         .footer-content {
           flex-direction: column;
@@ -382,16 +356,7 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
         <div class="header-content">
           <div class="header-left">
             <a href="/" class="logo">🔍 Search Algorithms</a>
-            <nav>
-              <ul>
-                <li><a href="/">🏠 Inicio</a></li>
-                <li><a href="/secciones/introduccion">📚 Introducción</a></li>
-                <li><a href="/secciones/no-informadas">🌐 No Informadas</a></li>
-                <li><a href="/secciones/informadas">🎯 Informadas</a></li>
-                <li><a href="/secciones/local">⛰️ Local</a></li>
-                <li><a href="/secciones/adversaria">♟️ Adversaria</a></li>
-              </ul>
-            </nav>
+            <Navigation />
           </div>
           <div class="header-right">
             <ThemeToggle />
