@@ -1,0 +1,399 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SectionHero from '../../components/SectionHero.astro';
+import AlgorithmCard from '../../components/AlgorithmCard.astro';
+import { categories, getAlgorithmsByCategory } from '../../data/algorithms';
+
+const section = categories['no-informadas'];
+const algorithms = getAlgorithmsByCategory('no-informadas');
+---
+
+<Layout title={`${section.title} - Search Algorithms`} description={section.description}>
+  <SectionHero
+    title={section.title}
+    subtitle={section.subtitle}
+    description={section.description}
+  />
+
+  <section class="intro-section">
+    <h2>Características de la Búsqueda No Informada</h2>
+    <p>
+      Los algoritmos de búsqueda no informada, también conocidos como "algoritmos ciegos",
+      no tienen información adicional sobre el problema más allá de su definición formal.
+      No conocen qué tan cerca están del objetivo, por lo que deben explorar sistemáticamente
+      el espacio de estados.
+    </p>
+
+    <div class="characteristics">
+      <div class="char-card">
+        <h3>🔍 Exploración Sistemática</h3>
+        <p>Siguen una estrategia predefinida para explorar el espacio de estados</p>
+      </div>
+      <div class="char-card">
+        <h3>📊 Sin Heurísticas</h3>
+        <p>No utilizan información adicional sobre la proximidad al objetivo</p>
+      </div>
+      <div class="char-card">
+        <h3>🎯 Garantías Teóricas</h3>
+        <p>Ofrecen propiedades bien definidas de completitud y optimalidad</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="algorithms-section">
+    <h2>Algoritmos de Búsqueda No Informada</h2>
+    <div class="algorithms-grid">
+      {algorithms.map(algo => (
+        <AlgorithmCard
+          title={algo.title}
+          description={algo.description}
+          href={`/algoritmos/${algo.id}`}
+          complexity={algo.complexity.time}
+          optimal={algo.optimal}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="comparison-section">
+    <h2>Comparación de Algoritmos</h2>
+    <div class="comparison-table-container">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Algoritmo</th>
+            <th>Completo</th>
+            <th>Óptimo</th>
+            <th>Complejidad Temporal</th>
+            <th>Complejidad Espacial</th>
+          </tr>
+        </thead>
+        <tbody>
+          {algorithms.map(algo => (
+            <tr>
+              <td class="algorithm-name">
+                <a href={`/algoritmos/${algo.id}`}>{algo.title}</a>
+              </td>
+              <td>
+                <span class={`status ${algo.complete ? 'yes' : 'no'}`}>
+                  {algo.complete ? 'Sí' : 'No'}
+                </span>
+              </td>
+              <td>
+                <span class={`status ${algo.optimal ? 'yes' : 'no'}`}>
+                  {algo.optimal ? 'Sí' : 'No'}
+                </span>
+              </td>
+              <td class="complexity">{algo.complexity.time}</td>
+              <td class="complexity">{algo.complexity.space}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="strategy-guide">
+    <h2>¿Cuándo usar cada algoritmo?</h2>
+    <div class="guide-cards">
+      <div class="guide-card bfs">
+        <h3>🔵 Usa BFS cuando:</h3>
+        <ul>
+          <li>Necesitas la solución con menor número de pasos</li>
+          <li>La profundidad de la solución es pequeña</li>
+          <li>Tienes suficiente memoria disponible</li>
+          <li>El costo de cada paso es uniforme</li>
+        </ul>
+      </div>
+
+      <div class="guide-card dfs">
+        <h3>🟢 Usa DFS cuando:</h3>
+        <ul>
+          <li>La memoria es limitada</li>
+          <li>Las soluciones están a gran profundidad</li>
+          <li>Quieres explorar todo el espacio</li>
+          <li>El factor de ramificación es muy alto</li>
+        </ul>
+      </div>
+
+      <div class="guide-card ucs">
+        <h3>🟡 Usa UCS cuando:</h3>
+        <ul>
+          <li>Los costos de las acciones varían</li>
+          <li>Necesitas la solución de menor costo</li>
+          <li>Puedes permitirte mayor complejidad</li>
+          <li>La optimalidad es crítica</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="next-section">
+    <div class="next-content">
+      <h2>Siguiente: Búsqueda Informada</h2>
+      <p>
+        Descubre cómo las heurísticas pueden hacer que la búsqueda sea mucho más eficiente
+        guiando la exploración hacia soluciones prometedoras.
+      </p>
+      <a href="/secciones/informadas" class="next-button">
+        Explorar Búsqueda Informada →
+      </a>
+    </div>
+  </section>
+
+  <style>
+    .intro-section {
+      margin-bottom: 4rem;
+    }
+
+    .intro-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-text);
+    }
+
+    .intro-section p {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: var(--color-text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .characteristics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .char-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .char-card h3 {
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+      font-size: 1.125rem;
+    }
+
+    .char-card p {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .algorithms-section {
+      margin-bottom: 4rem;
+    }
+
+    .algorithms-section h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .algorithms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .comparison-section {
+      margin-bottom: 4rem;
+    }
+
+    .comparison-section h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .comparison-table-container {
+      overflow-x: auto;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .comparison-table th {
+      background: var(--color-accent);
+      color: white;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .comparison-table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .algorithm-name a {
+      color: var(--color-accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .algorithm-name a:hover {
+      text-decoration: underline;
+    }
+
+    .status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .status.yes {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.no {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .complexity {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--color-accent);
+    }
+
+    .strategy-guide {
+      margin-bottom: 4rem;
+    }
+
+    .strategy-guide h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .guide-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .guide-card {
+      border-radius: 8px;
+      padding: 2rem;
+      color: white;
+    }
+
+    .guide-card.bfs {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+    .guide-card.dfs {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .guide-card.ucs {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .guide-card h3 {
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+    }
+
+    .guide-card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .guide-card li {
+      padding: 0.5rem 0;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+
+    .guide-card li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: white;
+      font-weight: bold;
+    }
+
+    .next-section {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      padding: 3rem 2rem;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .next-content h2 {
+      color: var(--color-text);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .next-content p {
+      color: var(--color-text-muted);
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .next-button {
+      display: inline-block;
+      background: var(--color-accent);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+    }
+
+    .next-button:hover {
+      background: var(--color-accent-light);
+    }
+
+    @media (max-width: 768px) {
+      .characteristics {
+        grid-template-columns: 1fr;
+      }
+
+      .algorithms-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .guide-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-table-container {
+        font-size: 0.875rem;
+      }
+
+      .comparison-table th,
+      .comparison-table td {
+        padding: 0.75rem 0.5rem;
+      }
+    }
+  </style>
+</Layout>

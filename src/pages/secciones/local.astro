@@ -1,0 +1,658 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SectionHero from '../../components/SectionHero.astro';
+import AlgorithmCard from '../../components/AlgorithmCard.astro';
+import { categories, getAlgorithmsByCategory } from '../../data/algorithms';
+
+const section = categories['local'];
+const algorithms = getAlgorithmsByCategory('local');
+---
+
+<Layout title={`${section.title} - Search Algorithms`} description={section.description}>
+  <SectionHero
+    title={section.title}
+    subtitle={section.subtitle}
+    description={section.description}
+  />
+
+  <section class="intro-section">
+    <h2>Un Enfoque Diferente: Optimización Local</h2>
+    <p>
+      A diferencia de los algoritmos de búsqueda sistemática, la búsqueda local opera
+      sobre una solución única que va mejorando iterativamente. Son especialmente útiles
+      para problemas de optimización donde el camino hacia la solución no importa,
+      solo la calidad de la solución final.
+    </p>
+
+    <div class="key-differences">
+      <div class="diff-card search">
+        <h3>🔍 Búsqueda Tradicional</h3>
+        <ul>
+          <li>Mantiene múltiples caminos</li>
+          <li>Explora sistemáticamente</li>
+          <li>Garantías de completitud</li>
+          <li>Alto uso de memoria</li>
+          <li>Encuentra caminos óptimos</li>
+        </ul>
+      </div>
+
+      <div class="diff-card local">
+        <h3>🎯 Búsqueda Local</h3>
+        <ul>
+          <li>Una solución actual</li>
+          <li>Mejora iterativamente</li>
+          <li>Sin garantías globales</li>
+          <li>Memoria constante O(1)</li>
+          <li>Optimiza estados finales</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="algorithms-section">
+    <h2>Algoritmos de Búsqueda Local</h2>
+    <div class="algorithms-grid">
+      {algorithms.map(algo => (
+        <AlgorithmCard
+          title={algo.title}
+          description={algo.description}
+          href={`/algoritmos/${algo.id}`}
+          complexity={algo.complexity.time}
+          optimal={algo.optimal}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="landscape-section">
+    <h2>Navegando el Paisaje de Soluciones</h2>
+    <p>
+      La búsqueda local puede visualizarse como navegar un paisaje donde la altura
+      representa la calidad de la solución. El objetivo es encontrar picos (máximos)
+      o valles (mínimos) dependiendo del problema.
+    </p>
+
+    <div class="landscape-problems">
+      <div class="problem-card">
+        <h3>🏔️ Máximos Locales</h3>
+        <p>
+          El algoritmo se "atasca" en una solución que es mejor que todos sus vecinos,
+          pero no es la mejor globalmente.
+        </p>
+        <div class="solution">
+          <strong>Soluciones:</strong> Random restart, Simulated annealing
+        </div>
+      </div>
+
+      <div class="problem-card">
+        <h3>🏜️ Mesetas</h3>
+        <p>
+          Regiones planas donde todos los vecinos tienen el mismo valor, haciendo
+          difícil decidir qué dirección tomar.
+        </p>
+        <div class="solution">
+          <strong>Soluciones:</strong> Movimientos aleatorios, Tabu search
+        </div>
+      </div>
+
+      <div class="problem-card">
+        <h3>⛰️ Cordilleras</h3>
+        <p>
+          Secuencias de máximos locales conectados por valles, requiriendo movimientos
+          que temporalmente empeoran la solución.
+        </p>
+        <div class="solution">
+          <strong>Soluciones:</strong> Simulated annealing, Genetic algorithms
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="applications-section">
+    <h2>Aplicaciones de la Búsqueda Local</h2>
+    <div class="applications-grid">
+      <div class="app-card">
+        <h3>📦 Traveling Salesman Problem (TSP)</h3>
+        <p>
+          Encontrar la ruta más corta que visite todas las ciudades exactamente una vez.
+        </p>
+        <div class="app-details">
+          <p><strong>Representación:</strong> Permutación de ciudades</p>
+          <p><strong>Operadores:</strong> 2-opt, 3-opt, intercambio de ciudades</p>
+          <p><strong>Función objetivo:</strong> Minimizar distancia total</p>
+        </div>
+      </div>
+
+      <div class="app-card">
+        <h3>📋 Scheduling</h3>
+        <p>
+          Asignar tareas a recursos (máquinas, personas) optimizando tiempo o costo.
+        </p>
+        <div class="app-details">
+          <p><strong>Representación:</strong> Asignación tarea → recurso</p>
+          <p><strong>Operadores:</strong> Reasignar tareas, cambiar orden</p>
+          <p><strong>Función objetivo:</strong> Minimizar makespan o costo</p>
+        </div>
+      </div>
+
+      <div class="app-card">
+        <h3>🧬 Optimización de Parámetros</h3>
+        <p>
+          Ajustar parámetros de modelos de machine learning o sistemas complejos.
+        </p>
+        <div class="app-details">
+          <p><strong>Representación:</strong> Vector de parámetros reales</p>
+          <p><strong>Operadores:</strong> Perturbación gaussiana, crossover</p>
+          <p><strong>Función objetivo:</strong> Minimizar error o maximizar precisión</p>
+        </div>
+      </div>
+
+      <div class="app-card">
+        <h3>🏗️ Circuit Design</h3>
+        <p>
+          Optimizar el layout de circuitos integrados para minimizar área y delay.
+        </p>
+        <div class="app-details">
+          <p><strong>Representación:</strong> Posiciones de componentes</p>
+          <p><strong>Operadores:</strong> Mover, rotar, intercambiar componentes</p>
+          <p><strong>Función objetivo:</strong> Minimizar área y conexiones</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="techniques-section">
+    <h2>Técnicas Avanzadas</h2>
+    <div class="techniques-grid">
+      <div class="technique-card">
+        <h3>🔄 Random Restart</h3>
+        <p>
+          Ejecutar hill climbing múltiples veces desde diferentes estados iniciales
+          aleatorios para evitar quedar atrapado en máximos locales.
+        </p>
+        <div class="formula">
+          Probabilidad de éxito ≈ 1 - (1 - p)ⁿ
+        </div>
+        <p class="formula-desc">donde p es la probabilidad de éxito por intento</p>
+      </div>
+
+      <div class="technique-card">
+        <h3>🌡️ Cooling Schedules</h3>
+        <p>
+          En simulated annealing, diferentes estrategias para reducir la temperatura
+          afectan el balance entre exploración y explotación.
+        </p>
+        <div class="cooling-types">
+          <p><strong>Lineal:</strong> T(t) = T₀ - αt</p>
+          <p><strong>Exponencial:</strong> T(t) = T₀ × γᵗ</p>
+          <p><strong>Logarítmica:</strong> T(t) = T₀ / log(t+1)</p>
+        </div>
+      </div>
+
+      <div class="technique-card">
+        <h3>🚫 Tabu Search</h3>
+        <p>
+          Mantiene una lista de movimientos "prohibidos" para evitar ciclos y
+          explorar nuevas regiones del espacio de búsqueda.
+        </p>
+        <div class="tabu-features">
+          <p><strong>Lista tabú:</strong> Movimientos recientes prohibidos</p>
+          <p><strong>Criterio de aspiración:</strong> Permitir movimientos tabú excepcionales</p>
+          <p><strong>Diversificación:</strong> Forzar exploración de nuevas áreas</p>
+        </div>
+      </div>
+
+      <div class="technique-card">
+        <h3>🧬 Evolutionary Methods</h3>
+        <p>
+          Mantienen una población de soluciones que evolucionan usando operadores
+          inspirados en la evolución biológica.
+        </p>
+        <div class="evo-operators">
+          <p><strong>Selección:</strong> Elegir padres basado en fitness</p>
+          <p><strong>Crossover:</strong> Combinar soluciones parentales</p>
+          <p><strong>Mutación:</strong> Introducir variaciones aleatorias</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="comparison-table-section">
+    <h2>Comparación de Métodos</h2>
+    <div class="table-container">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Característica</th>
+            <th>Hill Climbing</th>
+            <th>Simulated Annealing</th>
+            <th>Tabu Search</th>
+            <th>Genetic Algorithm</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Memoria requerida</td>
+            <td>O(1)</td>
+            <td>O(1)</td>
+            <td>O(k)</td>
+            <td>O(n×p)</td>
+          </tr>
+          <tr>
+            <td>Escapa máximos locales</td>
+            <td>No</td>
+            <td>Sí</td>
+            <td>Sí</td>
+            <td>Sí</td>
+          </tr>
+          <tr>
+            <td>Parámetros a ajustar</td>
+            <td>Ninguno</td>
+            <td>T₀, schedule</td>
+            <td>Tabu size</td>
+            <td>Pop size, rates</td>
+          </tr>
+          <tr>
+            <td>Mejor para</td>
+            <td>Problemas convexos</td>
+            <td>Optimización global</td>
+            <td>Problemas discretos</td>
+            <td>Problemas complejos</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="next-section">
+    <div class="next-content">
+      <h2>Siguiente: Búsqueda Adversaria</h2>
+      <p>
+        Explora algoritmos para toma de decisiones en entornos competitivos
+        donde hay oponentes inteligentes.
+      </p>
+      <a href="/secciones/adversaria" class="next-button">
+        Explorar Búsqueda Adversaria →
+      </a>
+    </div>
+  </section>
+
+  <style>
+    .intro-section {
+      margin-bottom: 4rem;
+    }
+
+    .intro-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-text);
+    }
+
+    .intro-section p {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: var(--color-text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .key-differences {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .diff-card {
+      border-radius: 8px;
+      padding: 2rem;
+      color: white;
+    }
+
+    .diff-card.search {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+    .diff-card.local {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .diff-card h3 {
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+    }
+
+    .diff-card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .diff-card li {
+      padding: 0.5rem 0;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+
+    .diff-card li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: white;
+      font-weight: bold;
+    }
+
+    .algorithms-section {
+      margin-bottom: 4rem;
+    }
+
+    .algorithms-section h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .algorithms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .landscape-section {
+      margin-bottom: 4rem;
+    }
+
+    .landscape-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .landscape-section p {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: var(--color-text-muted);
+      margin-bottom: 2rem;
+      text-align: center;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .landscape-problems {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .problem-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .problem-card h3 {
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .problem-card p {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .solution {
+      background: #f0f9ff;
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      color: var(--color-text);
+    }
+
+    .applications-section {
+      margin-bottom: 4rem;
+    }
+
+    .applications-section h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .applications-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .app-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: transform 0.2s ease;
+    }
+
+    .app-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .app-card h3 {
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+      font-size: 1.125rem;
+    }
+
+    .app-card > p {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .app-details {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 6px;
+    }
+
+    .app-details p {
+      margin: 0.5rem 0;
+      font-size: 0.875rem;
+      color: var(--color-text);
+    }
+
+    .techniques-section {
+      margin-bottom: 4rem;
+    }
+
+    .techniques-section h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .techniques-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .technique-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .technique-card h3 {
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+      font-size: 1.125rem;
+    }
+
+    .technique-card p {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .formula {
+      background: #f1f5f9;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--color-accent);
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .formula-desc {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      text-align: center;
+      margin: 0.5rem 0;
+    }
+
+    .cooling-types,
+    .tabu-features,
+    .evo-operators {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+
+    .cooling-types p,
+    .tabu-features p,
+    .evo-operators p {
+      margin: 0.25rem 0;
+      color: var(--color-text);
+    }
+
+    .comparison-table-section {
+      margin-bottom: 4rem;
+    }
+
+    .comparison-table-section h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .comparison-table th {
+      background: var(--color-accent);
+      color: white;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .comparison-table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.875rem;
+    }
+
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comparison-table td:first-child {
+      font-weight: 500;
+      color: var(--color-text);
+    }
+
+    .next-section {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      padding: 3rem 2rem;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .next-content h2 {
+      color: var(--color-text);
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .next-content p {
+      color: var(--color-text-muted);
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .next-button {
+      display: inline-block;
+      background: var(--color-accent);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+    }
+
+    .next-button:hover {
+      background: var(--color-accent-light);
+    }
+
+    @media (max-width: 768px) {
+      .key-differences {
+        grid-template-columns: 1fr;
+      }
+
+      .landscape-problems {
+        grid-template-columns: 1fr;
+      }
+
+      .applications-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .techniques-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .algorithms-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-table {
+        font-size: 0.75rem;
+      }
+
+      .comparison-table th,
+      .comparison-table td {
+        padding: 0.5rem;
+      }
+    }
+  </style>
+</Layout>

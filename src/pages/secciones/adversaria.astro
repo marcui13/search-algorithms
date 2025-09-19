@@ -1,0 +1,807 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SectionHero from '../../components/SectionHero.astro';
+import AlgorithmCard from '../../components/AlgorithmCard.astro';
+import { categories, getAlgorithmsByCategory } from '../../data/algorithms';
+
+const section = categories['adversaria'];
+const algorithms = getAlgorithmsByCategory('adversaria');
+---
+
+<Layout title={`${section.title} - Search Algorithms`} description={section.description}>
+  <SectionHero
+    title={section.title}
+    subtitle={section.subtitle}
+    description={section.description}
+  />
+
+  <section class="intro-section">
+    <h2>Cuando Hay Oponentes Inteligentes</h2>
+    <p>
+      La búsqueda adversaria se aplica en entornos competitivos donde múltiples agentes
+      inteligentes toman decisiones que afectan mutuamente sus objetivos. A diferencia
+      de la búsqueda tradicional, aquí debemos considerar las acciones de un oponente
+      que también actúa de manera óptima.
+    </p>
+
+    <div class="game-types">
+      <div class="game-card">
+        <h3>🎲 Juegos Deterministas</h3>
+        <p>Resultado completamente determinado por las acciones de los jugadores</p>
+        <div class="examples">
+          <strong>Ejemplos:</strong> Ajedrez, Damas, Tic-tac-toe, Go
+        </div>
+      </div>
+
+      <div class="game-card">
+        <h3>🎰 Juegos Estocásticos</h3>
+        <p>Incluyen elementos de azar que afectan el resultado</p>
+        <div class="examples">
+          <strong>Ejemplos:</strong> Backgammon, Poker, Monopoly
+        </div>
+      </div>
+
+      <div class="game-card">
+        <h3>👁️ Información Perfecta vs Imperfecta</h3>
+        <p>Los jugadores pueden ver todo el estado o solo parte de él</p>
+        <div class="examples">
+          <strong>Perfecta:</strong> Ajedrez, Go<br>
+          <strong>Imperfecta:</strong> Poker, Stratego
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="game-theory-section">
+    <h2>Fundamentos de Teoría de Juegos</h2>
+    <div class="theory-content">
+      <div class="theory-card">
+        <h3>🎯 Juegos de Suma Cero</h3>
+        <p>
+          La ganancia de un jugador es exactamente la pérdida del otro.
+          Si el jugador A gana +5, el jugador B gana -5.
+        </p>
+        <div class="theory-example">
+          <strong>Característica:</strong> Ganancia total = 0
+        </div>
+      </div>
+
+      <div class="theory-card">
+        <h3>🧠 Racionalidad</h3>
+        <p>
+          Asumimos que ambos jugadores actúan de manera óptima para maximizar
+          su propia utilidad y minimizar la del oponente.
+        </p>
+        <div class="theory-example">
+          <strong>Implicación:</strong> Cada jugador anticipa las mejores jugadas del oponente
+        </div>
+      </div>
+
+      <div class="theory-card">
+        <h3>⚖️ Valor Minimax</h3>
+        <p>
+          El valor que puede garantizar un jugador independientemente de las
+          acciones del oponente, asumiendo juego óptimo de ambos lados.
+        </p>
+        <div class="theory-example">
+          <strong>Teorema:</strong> En juegos finitos deterministas, siempre existe un valor minimax
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="algorithms-section">
+    <h2>Algoritmos de Búsqueda Adversaria</h2>
+    <div class="algorithms-grid">
+      {algorithms.map(algo => (
+        <AlgorithmCard
+          title={algo.title}
+          description={algo.description}
+          href={`/algoritmos/${algo.id}`}
+          complexity={algo.complexity.time}
+          optimal={algo.optimal}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="minimax-example">
+    <h2>Minimax en Acción: Tic-Tac-Toe</h2>
+    <div class="example-content">
+      <div class="game-tree">
+        <h3>Árbol de Juego Simplificado</h3>
+        <div class="tree-visualization">
+          <div class="tree-level level-0">
+            <div class="node max-node">
+              <span class="node-label">MAX</span>
+              <span class="node-value">5</span>
+            </div>
+          </div>
+
+          <div class="tree-level level-1">
+            <div class="node min-node">
+              <span class="node-value">5</span>
+            </div>
+            <div class="node min-node">
+              <span class="node-value">6</span>
+            </div>
+            <div class="node min-node">
+              <span class="node-value">7</span>
+            </div>
+          </div>
+
+          <div class="tree-level level-2">
+            <div class="node max-node"><span class="node-value">5</span></div>
+            <div class="node max-node"><span class="node-value">6</span></div>
+            <div class="node max-node"><span class="node-value">6</span></div>
+            <div class="node max-node"><span class="node-value">7</span></div>
+            <div class="node max-node"><span class="node-value">5</span></div>
+            <div class="node max-node"><span class="node-value">9</span></div>
+          </div>
+
+          <div class="tree-level level-3">
+            <div class="node leaf">5</div>
+            <div class="node leaf">6</div>
+            <div class="node leaf">7</div>
+            <div class="node leaf">4</div>
+            <div class="node leaf">5</div>
+            <div class="node leaf">9</div>
+            <div class="node leaf">1</div>
+            <div class="node leaf">2</div>
+            <div class="node leaf">7</div>
+            <div class="node leaf">5</div>
+            <div class="node leaf">1</div>
+            <div class="node leaf">3</div>
+          </div>
+        </div>
+
+        <div class="tree-explanation">
+          <p><strong>Proceso:</strong></p>
+          <ol>
+            <li>MAX elige el máximo de sus opciones: max(5, 6, 7) = 7</li>
+            <li>Pero MIN elegirá el mínimo para él: min(6, 7) = 6, min(5, 9) = 5</li>
+            <li>Conociendo esto, MAX debe elegir: max(5, 6, 5) = 6</li>
+            <li>La mejor jugada para MAX lleva a un valor de 5</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="evaluation-functions">
+        <h3>Función de Evaluación</h3>
+        <p>
+          En juegos complejos, es imposible explorar hasta el final. Se usa una
+          función de evaluación que estima qué tan buena es una posición:
+        </p>
+        <div class="eval-examples">
+          <div class="eval-item">
+            <strong>Ajedrez:</strong> Material + Posición + Seguridad del Rey + Control del Centro
+          </div>
+          <div class="eval-item">
+            <strong>Go:</strong> Territorio + Influencia + Captura + Vida de grupos
+          </div>
+          <div class="eval-item">
+            <strong>Othello:</strong> Movilidad + Estabilidad + Esquinas + Bordes
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alpha-beta-section">
+    <h2>Optimización: Poda Alfa-Beta</h2>
+    <div class="alpha-beta-content">
+      <div class="pruning-explanation">
+        <h3>¿Cómo Funciona la Poda?</h3>
+        <p>
+          La poda alfa-beta elimina ramas del árbol que no pueden influir en la decisión final.
+          Mantiene dos valores: α (mejor opción para MAX) y β (mejor opción para MIN).
+        </p>
+
+        <div class="pruning-rules">
+          <div class="rule">
+            <h4>Poda α (Alfa)</h4>
+            <p>
+              Si en un nodo MIN, β ≤ α, se puede podar. MIN ya tiene una opción mejor en otro lugar.
+            </p>
+          </div>
+          <div class="rule">
+            <h4>Poda β (Beta)</h4>
+            <p>
+              Si en un nodo MAX, α ≥ β, se puede podar. MAX ya tiene una opción mejor en otro lugar.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="performance-comparison">
+        <h3>Mejoras de Rendimiento</h3>
+        <div class="perf-stats">
+          <div class="stat-card">
+            <h4>Sin Poda</h4>
+            <div class="complexity">O(b^d)</div>
+            <p>Explora todo el árbol</p>
+          </div>
+          <div class="stat-arrow">→</div>
+          <div class="stat-card">
+            <h4>Con Poda Perfecta</h4>
+            <div class="complexity">O(b^(d/2))</div>
+            <p>Duplica la profundidad alcanzable</p>
+          </div>
+        </div>
+
+        <div class="practical-impact">
+          <p>
+            <strong>Impacto práctico:</strong> En ajedrez, si sin poda puedes ver 4 jugadas adelante,
+            con poda perfecta puedes ver 8 jugadas con el mismo tiempo de cómputo.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="advanced-topics">
+    <h2>Temas Avanzados</h2>
+    <div class="topics-grid">
+      <div class="topic-card">
+        <h3>🎲 Expectiminimax</h3>
+        <p>
+          Extensión de minimax para juegos con elementos de azar. Incluye nodos
+          de probabilidad que calculan el valor esperado.
+        </p>
+        <div class="formula">
+          E[X] = Σ P(outcome) × Value(outcome)
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <h3>⏰ Anytime Algorithms</h3>
+        <p>
+          Algoritmos que pueden ser interrumpidos en cualquier momento y devolver
+          la mejor respuesta encontrada hasta ese momento.
+        </p>
+        <div class="example">
+          <strong>Ejemplo:</strong> Iterative Deepening con límite de tiempo
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <h3>🔍 Forward Pruning</h3>
+        <p>
+          Técnicas que eliminan movimientos que parecen malos sin explorarlos
+          completamente (beam search, null move pruning).
+        </p>
+        <div class="example">
+          <strong>Riesgo:</strong> Puede eliminar movimientos que resultarían ser buenos
+        </div>
+      </div>
+
+      <div class="topic-card">
+        <h3>📚 Opening Books & Endgame Tables</h3>
+        <p>
+          Uso de conocimiento precomputado para las fases de apertura y final
+          del juego donde hay patrones conocidos.
+        </p>
+        <div class="example">
+          <strong>Ventaja:</strong> Juego perfecto en posiciones conocidas
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="applications-modern">
+    <h2>Aplicaciones Modernas</h2>
+    <div class="modern-apps">
+      <div class="app-modern">
+        <h3>🤖 IA en Videojuegos</h3>
+        <p>
+          NPCs inteligentes que proporcionan desafío apropiado sin ser frustrantes.
+          Balanceo entre competitividad y diversión.
+        </p>
+      </div>
+
+      <div class="app-modern">
+        <h3>💰 Trading Algorítmico</h3>
+        <p>
+          Estrategias que consideran las acciones de otros traders en mercados
+          financieros altamente competitivos.
+        </p>
+      </div>
+
+      <div class="app-modern">
+        <h3>🚗 Navegación Autónoma</h3>
+        <p>
+          Vehículos que deben anticipar las acciones de otros conductores
+          para tomar decisiones seguras.
+        </p>
+      </div>
+
+      <div class="app-modern">
+        <h3>🏆 Esports y Competencias</h3>
+        <p>
+          Análisis de estrategias óptimas en deportes electrónicos y
+          desarrollo de agentes para competencias.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .intro-section {
+      margin-bottom: 4rem;
+    }
+
+    .intro-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-text);
+    }
+
+    .intro-section p {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: var(--color-text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .game-types {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .game-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: transform 0.2s ease;
+    }
+
+    .game-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .game-card h3 {
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+      font-size: 1.125rem;
+    }
+
+    .game-card p {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .examples {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      color: var(--color-text);
+    }
+
+    .game-theory-section {
+      margin-bottom: 4rem;
+    }
+
+    .game-theory-section h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .theory-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .theory-card {
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .theory-card h3 {
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+      font-size: 1.125rem;
+    }
+
+    .theory-card p {
+      color: var(--color-text);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .theory-example {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      color: var(--color-text);
+    }
+
+    .algorithms-section {
+      margin-bottom: 4rem;
+    }
+
+    .algorithms-section h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .algorithms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .minimax-example {
+      margin-bottom: 4rem;
+    }
+
+    .minimax-example h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .example-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .game-tree {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .tree-visualization {
+      margin: 1.5rem 0;
+    }
+
+    .tree-level {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 40px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .max-node {
+      background: #dbeafe;
+      border: 2px solid #3b82f6;
+      color: #1e40af;
+    }
+
+    .min-node {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      color: #92400e;
+    }
+
+    .leaf {
+      background: #f3f4f6;
+      border: 2px solid #6b7280;
+      color: #374151;
+    }
+
+    .node-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+    }
+
+    .node-value {
+      font-size: 0.875rem;
+      font-weight: 700;
+    }
+
+    .tree-explanation {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+    }
+
+    .tree-explanation ol {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .tree-explanation li {
+      margin: 0.25rem 0;
+      font-size: 0.875rem;
+    }
+
+    .evaluation-functions {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .evaluation-functions h3 {
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+    }
+
+    .eval-examples {
+      margin-top: 1rem;
+    }
+
+    .eval-item {
+      background: #f1f5f9;
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin: 0.5rem 0;
+      font-size: 0.875rem;
+    }
+
+    .alpha-beta-section {
+      margin-bottom: 4rem;
+    }
+
+    .alpha-beta-section h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .alpha-beta-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .pruning-explanation {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .pruning-rules {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .rule {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 6px;
+    }
+
+    .rule h4 {
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .rule p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+
+    .performance-comparison {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .perf-stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .stat-card {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      flex: 1;
+    }
+
+    .stat-card h4 {
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .complexity {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--color-text);
+      margin: 0.5rem 0;
+    }
+
+    .stat-card p {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+
+    .stat-arrow {
+      font-size: 1.5rem;
+      color: var(--color-accent);
+      font-weight: bold;
+    }
+
+    .practical-impact {
+      background: #f0f9ff;
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+
+    .advanced-topics {
+      margin-bottom: 4rem;
+    }
+
+    .advanced-topics h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .topic-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .topic-card h3 {
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+      font-size: 1.125rem;
+    }
+
+    .topic-card p {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .formula {
+      background: #f1f5f9;
+      padding: 0.75rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--color-accent);
+      text-align: center;
+    }
+
+    .example {
+      background: #f8fafc;
+      padding: 0.75rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      color: var(--color-text);
+    }
+
+    .applications-modern {
+      margin-bottom: 4rem;
+    }
+
+    .applications-modern h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .modern-apps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .app-modern {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+    }
+
+    .app-modern h3 {
+      margin-bottom: 1rem;
+      font-size: 1.125rem;
+    }
+
+    .app-modern p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      opacity: 0.9;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .game-types {
+        grid-template-columns: 1fr;
+      }
+
+      .theory-content {
+        grid-template-columns: 1fr;
+      }
+
+      .example-content {
+        grid-template-columns: 1fr;
+      }
+
+      .alpha-beta-content {
+        grid-template-columns: 1fr;
+      }
+
+      .topics-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modern-apps {
+        grid-template-columns: 1fr;
+      }
+
+      .algorithms-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .perf-stats {
+        flex-direction: column;
+      }
+
+      .stat-arrow {
+        transform: rotate(90deg);
+      }
+
+      .tree-level {
+        flex-wrap: wrap;
+      }
+
+      .node {
+        width: 40px;
+        height: 35px;
+        font-size: 0.625rem;
+      }
+    }
+  </style>
+</Layout>

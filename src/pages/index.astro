@@ -1,0 +1,203 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Search Algorithms - Inicio" description="Explora y aprende sobre algoritmos de búsqueda: desde BFS y DFS hasta A* y búsqueda adversaria.">
+  <section class="hero">
+    <h1>Algoritmos de Búsqueda</h1>
+    <p class="hero-subtitle">
+      Explora y comprende los fundamentos de los algoritmos de búsqueda,
+      desde estrategias básicas hasta técnicas avanzadas de optimización.
+    </p>
+  </section>
+
+  <section class="intro-section">
+    <h2>¿Qué son los problemas de búsqueda?</h2>
+    <p>
+      Los problemas de búsqueda son una clase fundamental de problemas en ciencias de la computación
+      e inteligencia artificial. Se centran en encontrar una secuencia de acciones que lleven desde
+      un estado inicial hasta un estado objetivo deseado.
+    </p>
+
+    <div class="key-concepts">
+      <div class="concept-card">
+        <h3>Estado inicial</h3>
+        <p>El punto de partida del problema</p>
+      </div>
+      <div class="concept-card">
+        <h3>Estado objetivo</h3>
+        <p>El resultado que queremos alcanzar</p>
+      </div>
+      <div class="concept-card">
+        <h3>Acciones</h3>
+        <p>Las operaciones disponibles en cada estado</p>
+      </div>
+      <div class="concept-card">
+        <h3>Función de costo</h3>
+        <p>Métrica para evaluar la calidad de las soluciones</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sections-overview">
+    <h2>Explora las secciones</h2>
+    <div class="section-cards">
+      <a href="/secciones/introduccion" class="section-card">
+        <h3>Introducción</h3>
+        <p>Fundamentos y definiciones formales de los problemas de búsqueda</p>
+      </a>
+
+      <a href="/secciones/no-informadas" class="section-card">
+        <h3>Búsqueda No Informada</h3>
+        <p>BFS, DFS, UCS y otras estrategias que no usan heurísticas</p>
+      </a>
+
+      <a href="/secciones/informadas" class="section-card">
+        <h3>Búsqueda Informada</h3>
+        <p>A*, Greedy y algoritmos que aprovechan heurísticas</p>
+      </a>
+
+      <a href="/secciones/local" class="section-card">
+        <h3>Búsqueda Local</h3>
+        <p>Hill climbing, simulated annealing y optimización local</p>
+      </a>
+
+      <a href="/secciones/adversaria" class="section-card">
+        <h3>Búsqueda Adversaria</h3>
+        <p>Minimax, alfa-beta pruning y teoría de juegos</p>
+      </a>
+    </div>
+  </section>
+
+  <style>
+    .hero {
+      text-align: center;
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 4rem;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--color-text), var(--color-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--color-text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .intro-section {
+      margin-bottom: 4rem;
+    }
+
+    .intro-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: var(--color-text);
+    }
+
+    .intro-section p {
+      font-size: 1.125rem;
+      color: var(--color-text-muted);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+
+    .key-concepts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .concept-card {
+      padding: 1.5rem;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      background: white;
+    }
+
+    .concept-card h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--color-accent);
+    }
+
+    .concept-card p {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      margin: 0;
+    }
+
+    .sections-overview h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: var(--color-text);
+      text-align: center;
+    }
+
+    .section-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .section-card {
+      display: block;
+      padding: 2rem;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      background: white;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .section-card:hover {
+      border-color: var(--color-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--color-accent);
+    }
+
+    .section-card p {
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+
+      .key-concepts {
+        grid-template-columns: 1fr;
+      }
+
+      .section-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</Layout>

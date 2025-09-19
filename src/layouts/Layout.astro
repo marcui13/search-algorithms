@@ -1,0 +1,150 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <style>
+      :root {
+        --color-bg: #fafafa;
+        --color-text: #1a1a1a;
+        --color-text-muted: #6b7280;
+        --color-border: #e5e7eb;
+        --color-accent: #2563eb;
+        --color-accent-light: #3b82f6;
+        --font-sans: system-ui, -apple-system, sans-serif;
+        --font-mono: ui-monospace, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        font-family: var(--font-sans);
+        line-height: 1.6;
+      }
+
+      body {
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      header {
+        border-bottom: 1px solid var(--color-border);
+        background: var(--color-bg);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-text);
+        text-decoration: none;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+      }
+
+      nav a {
+        color: var(--color-text-muted);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+      }
+
+      nav a:hover {
+        color: var(--color-accent);
+      }
+
+      main {
+        flex: 1;
+        padding: 2rem 0;
+      }
+
+      footer {
+        border-top: 1px solid var(--color-border);
+        padding: 2rem 0;
+        text-align: center;
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+      }
+
+      @media (max-width: 768px) {
+        .header-content {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        nav ul {
+          gap: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="header-content">
+          <a href="/" class="logo">Search Algorithms</a>
+          <nav>
+            <ul>
+              <li><a href="/">Inicio</a></li>
+              <li><a href="/secciones/introduccion">Introducción</a></li>
+              <li><a href="/secciones/no-informadas">No Informadas</a></li>
+              <li><a href="/secciones/informadas">Informadas</a></li>
+              <li><a href="/secciones/local">Local</a></li>
+              <li><a href="/secciones/adversaria">Adversaria</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <slot />
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p>&copy; 2024 Search Algorithms. Sitio educativo sobre algoritmos de búsqueda.</p>
+      </div>
+    </footer>
+  </body>
+</html>

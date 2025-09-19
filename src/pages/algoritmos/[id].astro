@@ -1,0 +1,511 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { algorithms, getAlgorithmById } from '../../data/algorithms';
+
+export function getStaticPaths() {
+  return algorithms.map(algorithm => ({
+    params: { id: algorithm.id }
+  }));
+}
+
+const { id } = Astro.params;
+const algorithm = getAlgorithmById(id);
+
+if (!algorithm) {
+  return Astro.redirect('/404');
+}
+
+const relatedAlgorithms = algorithms
+  .filter(algo => algo.category === algorithm.category && algo.id !== algorithm.id)
+  .slice(0, 3);
+---
+
+<Layout title={`${algorithm.title} - Search Algorithms`} description={algorithm.description}>
+  <article class="algorithm-page">
+    <!-- Header Section -->
+    <header class="algorithm-header">
+      <div class="breadcrumb">
+        <a href="/">Inicio</a>
+        <span class="separator">→</span>
+        <a href={`/secciones/${algorithm.category}`}>
+          {algorithm.category === 'no-informadas' && 'Búsqueda No Informada'}
+          {algorithm.category === 'informadas' && 'Búsqueda Informada'}
+          {algorithm.category === 'local' && 'Búsqueda Local'}
+          {algorithm.category === 'adversaria' && 'Búsqueda Adversaria'}
+        </a>
+        <span class="separator">→</span>
+        <span class="current">{algorithm.title}</span>
+      </div>
+
+      <div class="algorithm-title">
+        <h1>{algorithm.title}</h1>
+        <div class="algorithm-badges">
+          {algorithm.optimal && <span class="badge optimal">Óptimo</span>}
+          {algorithm.complete && <span class="badge complete">Completo</span>}
+          <span class="badge category">
+            {algorithm.category === 'no-informadas' && 'No Informada'}
+            {algorithm.category === 'informadas' && 'Informada'}
+            {algorithm.category === 'local' && 'Local'}
+            {algorithm.category === 'adversaria' && 'Adversaria'}
+          </span>
+        </div>
+      </div>
+
+      <p class="algorithm-description">{algorithm.description}</p>
+    </header>
+
+    <!-- Quick Stats -->
+    <section class="quick-stats">
+      <div class="stat-card">
+        <h3>Complejidad Temporal</h3>
+        <code>{algorithm.complexity.time}</code>
+      </div>
+      <div class="stat-card">
+        <h3>Complejidad Espacial</h3>
+        <code>{algorithm.complexity.space}</code>
+      </div>
+      <div class="stat-card">
+        <h3>Optimalidad</h3>
+        <span class={`status ${algorithm.optimal ? 'optimal' : 'suboptimal'}`}>
+          {algorithm.optimal ? 'Óptimo' : 'Subóptimo'}
+        </span>
+      </div>
+      <div class="stat-card">
+        <h3>Completitud</h3>
+        <span class={`status ${algorithm.complete ? 'complete' : 'incomplete'}`}>
+          {algorithm.complete ? 'Completo' : 'Incompleto'}
+        </span>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="algorithm-content">
+      <!-- Explanation -->
+      <section class="explanation-section">
+        <h2>Explicación</h2>
+        <div class="explanation-content" set:html={algorithm.content.explanation.replace(/\n\n/g, '</p><p>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')} />
+      </section>
+
+      <!-- Pseudocode -->
+      <section class="pseudocode-section">
+        <h2>Pseudocódigo</h2>
+        <div class="pseudocode-container">
+          <pre><code>{algorithm.content.pseudocode.trim()}</code></pre>
+        </div>
+      </section>
+
+      <!-- Analysis -->
+      <section class="analysis-section">
+        <h2>Análisis Detallado</h2>
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <h3>⚡ Complejidad Temporal</h3>
+            <p>{algorithm.content.analysis.timeComplexity}</p>
+          </div>
+
+          <div class="analysis-card">
+            <h3>💾 Complejidad Espacial</h3>
+            <p>{algorithm.content.analysis.spaceComplexity}</p>
+          </div>
+
+          <div class="analysis-card">
+            <h3>🎯 Optimalidad</h3>
+            <p>{algorithm.content.analysis.optimality}</p>
+          </div>
+
+          <div class="analysis-card">
+            <h3>✅ Completitud</h3>
+            <p>{algorithm.content.analysis.completeness}</p>
+          </div>
+        </div>
+
+        <div class="data-structures">
+          <h3>🏗️ Estructuras de Datos Utilizadas</h3>
+          <ul class="structures-list">
+            {algorithm.content.analysis.dataStructures.map(structure => (
+              <li>{structure}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <!-- Related Algorithms -->
+    {relatedAlgorithms.length > 0 && (
+      <section class="related-section">
+        <h2>Algoritmos Relacionados</h2>
+        <div class="related-grid">
+          {relatedAlgorithms.map(related => (
+            <a href={`/algoritmos/${related.id}`} class="related-card">
+              <h3>{related.title}</h3>
+              <p>{related.description}</p>
+              <div class="related-complexity">
+                <span>Tiempo: {related.complexity.time}</span>
+                <span>Espacio: {related.complexity.space}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Navigation -->
+    <nav class="algorithm-navigation">
+      <a href={`/secciones/${algorithm.category}`} class="nav-button back">
+        ← Volver a la sección
+      </a>
+    </nav>
+  </article>
+
+  <style>
+    .algorithm-page {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .algorithm-header {
+      margin-bottom: 3rem;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.875rem;
+    }
+
+    .breadcrumb a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    .separator {
+      color: var(--color-text-muted);
+    }
+
+    .current {
+      color: var(--color-text-muted);
+    }
+
+    .algorithm-title {
+      margin-bottom: 1.5rem;
+    }
+
+    .algorithm-title h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 1rem;
+    }
+
+    .algorithm-badges {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 0.375rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .badge.optimal {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge.complete {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge.category {
+      background: #f3f4f6;
+      color: var(--color-text);
+    }
+
+    .algorithm-description {
+      font-size: 1.25rem;
+      line-height: 1.6;
+      color: var(--color-text-muted);
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+    }
+
+    .stat-card code {
+      background: #f1f5f9;
+      color: var(--color-accent);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .status {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .status.optimal,
+    .status.complete {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.suboptimal,
+    .status.incomplete {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .algorithm-content {
+      margin-bottom: 4rem;
+    }
+
+    .explanation-section,
+    .pseudocode-section,
+    .analysis-section {
+      margin-bottom: 3rem;
+    }
+
+    .explanation-section h2,
+    .pseudocode-section h2,
+    .analysis-section h2 {
+      font-size: 1.875rem;
+      color: var(--color-text);
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--color-border);
+      padding-bottom: 0.5rem;
+    }
+
+    .explanation-content {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--color-text);
+    }
+
+    .explanation-content p {
+      margin-bottom: 1rem;
+    }
+
+    .explanation-content strong {
+      color: var(--color-accent);
+      font-weight: 600;
+    }
+
+    .pseudocode-container {
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .pseudocode-container pre {
+      margin: 0;
+      color: #e2e8f0;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .analysis-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .analysis-card h3 {
+      color: var(--color-accent);
+      font-size: 1.125rem;
+      margin-bottom: 1rem;
+    }
+
+    .analysis-card p {
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .data-structures {
+      background: #f8fafc;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .data-structures h3 {
+      color: var(--color-accent);
+      font-size: 1.125rem;
+      margin-bottom: 1rem;
+    }
+
+    .structures-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .structures-list li {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--color-text);
+      font-weight: 500;
+    }
+
+    .structures-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .related-section {
+      margin-bottom: 3rem;
+    }
+
+    .related-section h2 {
+      font-size: 1.875rem;
+      color: var(--color-text);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .related-card {
+      display: block;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .related-card:hover {
+      border-color: var(--color-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .related-card h3 {
+      color: var(--color-accent);
+      font-size: 1.125rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .related-card p {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .related-complexity {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    .related-complexity span {
+      background: #f3f4f6;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .algorithm-navigation {
+      text-align: center;
+      padding: 2rem 0;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .nav-button {
+      display: inline-block;
+      background: var(--color-accent);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+    }
+
+    .nav-button:hover {
+      background: var(--color-accent-light);
+    }
+
+    @media (max-width: 768px) {
+      .algorithm-title h1 {
+        font-size: 2rem;
+      }
+
+      .quick-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .analysis-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .related-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .breadcrumb {
+        flex-wrap: wrap;
+      }
+
+      .algorithm-badges {
+        justify-content: center;
+      }
+    }
+  </style>
+</Layout>
