@@ -20,32 +20,51 @@
 </button>
 
 <script>
-  // Theme toggle functionality
+  // Modern theme toggle with View Transitions
   document.addEventListener('DOMContentLoaded', function() {
     const themeToggle = document.getElementById('theme-toggle');
-
     if (!themeToggle) return;
 
-    // Toggle theme function
-    const handleToggleClick = () => {
-      const element = document.documentElement;
-      const isDark = element.classList.contains('dark');
+    const toggleTheme = () => {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+      const newTheme = isDark ? 'light' : 'dark';
 
-      if (isDark) {
-        element.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
+      // Use View Transitions API if available
+      if (!document.startViewTransition) {
+        // Fallback: immediate toggle
+        html.classList.toggle('dark');
       } else {
-        element.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
+        // Smooth transition with View Transitions API
+        document.startViewTransition(() => {
+          html.classList.toggle('dark');
+        });
       }
+
+      // Save preference
+      try {
+        localStorage.setItem('theme', newTheme);
+      } catch (e) {}
     };
 
-    themeToggle.addEventListener('click', handleToggleClick);
+    themeToggle.addEventListener('click', toggleTheme);
 
-    // Listen for system theme changes
+    // System theme preference listener
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
       if (!localStorage.getItem('theme')) {
-        document.documentElement.classList[e.matches ? 'add' : 'remove']('dark');
+        const html = document.documentElement;
+
+        if (!document.startViewTransition) {
+          html.classList.toggle('dark', e.matches);
+        } else {
+          document.startViewTransition(() => {
+            html.classList.toggle('dark', e.matches);
+          });
+        }
+
+        try {
+          localStorage.setItem('theme', e.matches ? 'dark' : 'light');
+        } catch (err) {}
       }
     });
   });

@@ -25,19 +25,21 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
       rel="stylesheet"
     />
     <title>{title}</title>
+    <meta name="view-transition" content="same-origin">
+    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
     <script>
-      // Prevent theme flashing by applying theme before page render
+      // Simple theme detection without flashing
       (function() {
-        const getThemePreference = () => {
-          if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-            return localStorage.getItem('theme');
-          }
-          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        };
+        const theme = localStorage.getItem('theme') ||
+                     (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
-        const theme = getThemePreference();
         if (theme === 'dark') {
           document.documentElement.classList.add('dark');
+        }
+
+        if (!localStorage.getItem('theme')) {
+          localStorage.setItem('theme', theme);
         }
       })();
     </script>
@@ -78,6 +80,16 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
         --color-error: #f87171;
       }
 
+      /* View Transitions for smooth navigation */
+      @view-transition {
+        navigation: auto;
+      }
+
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 0.3s;
+      }
+
       * {
         box-sizing: border-box;
         margin: 0;
@@ -87,9 +99,6 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
       html {
         font-family: var(--font-sans);
         line-height: 1.6;
-        transition:
-          background-color 0.3s ease,
-          color 0.3s ease;
       }
 
       body {
@@ -98,9 +107,21 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+      }
+
+      /* Smooth transitions for theme changes */
+      *,
+      *::before,
+      *::after {
         transition:
-          background-color 0.3s ease,
-          color 0.3s ease;
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease;
+      }
+
+      /* Disable transitions on initial load */
+      .preload * {
+        transition: none !important;
       }
 
       /* Typography improvements */
@@ -150,7 +171,7 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
       .header-left {
         display: flex;
         align-items: center;
-        gap: 2rem;
+        gap: 0rem;
       }
 
       .header-right {
@@ -174,7 +195,6 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
         color: var(--color-accent);
         transform: translateY(-1px);
       }
-
 
       main {
         flex: 1;
@@ -243,7 +263,6 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
           gap: 1rem;
           text-align: center;
         }
-
 
         .footer-content {
           flex-direction: column;
@@ -350,7 +369,7 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
       }
     </style>
   </head>
-  <body>
+  <body class="preload">
     <header>
       <div class="container">
         <div class="header-content">
@@ -434,5 +453,30 @@ const { title, description = "Sitio educativo sobre algoritmos de búsqueda" } =
         </div>
       </div>
     </footer>
+
+    <script>
+      // Enable View Transitions API and smooth theme switching
+      document.addEventListener('DOMContentLoaded', function() {
+        // Remove preload class to enable transitions
+        document.body.classList.remove('preload');
+
+        // Storage event listener for cross-tab synchronization
+        window.addEventListener('storage', function(e) {
+          if (e.key === 'theme' && (e.newValue === 'dark' || e.newValue === 'light')) {
+            if (!document.startViewTransition) {
+              // Fallback for browsers without View Transitions
+              const html = document.documentElement;
+              html.classList.toggle('dark', e.newValue === 'dark');
+            } else {
+              // Use View Transitions API for smooth change
+              document.startViewTransition(() => {
+                const html = document.documentElement;
+                html.classList.toggle('dark', e.newValue === 'dark');
+              });
+            }
+          }
+        });
+      });
+    </script>
   </body>
 </html>

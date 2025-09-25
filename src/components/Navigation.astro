@@ -2,34 +2,39 @@
 const { pathname } = Astro.url;
 
 const navItems = [
-  { href: '/', label: '🏠 Inicio', emoji: '🏠' },
-  { href: '/secciones/introduccion', label: '📚 Introducción', emoji: '📚' },
-  { href: '/secciones/no-informadas', label: '🌐 No Informadas', emoji: '🌐' },
-  { href: '/secciones/informadas', label: '🎯 Informadas', emoji: '🎯' },
-  { href: '/secciones/local', label: '⛰️ Local', emoji: '⛰️' },
-  { href: '/secciones/adversaria', label: '♟️ Adversaria', emoji: '♟️' }
+  { href: "/", label: "🏠 Inicio", emoji: "🏠" },
+  { href: "/secciones/introduccion", label: "📚 Introducción", emoji: "📚" },
+  { href: "/secciones/no-informadas", label: "🌐 No Informadas", emoji: "🌐" },
+  { href: "/secciones/informadas", label: "🎯 Informadas", emoji: "🎯" },
+  { href: "/secciones/local", label: "⛰️ Local", emoji: "⛰️" },
+  { href: "/secciones/adversaria", label: "♟️ Adversaria", emoji: "♟️" },
 ];
 
 const isActive = (href: string) => {
-  if (href === '/' && pathname === '/') return true;
-  if (href !== '/' && pathname.startsWith(href)) return true;
+  if (href === "/" && pathname === "/") return true;
+  if (href !== "/" && pathname.startsWith(href)) return true;
   return false;
 };
 ---
 
 <nav>
   <ul>
-    {navItems.map(item => (
-      <li>
-        <a
-          href={item.href}
-          class={isActive(item.href) ? 'nav-link active' : 'nav-link'}
-          aria-current={isActive(item.href) ? 'page' : undefined}
-        >
-          {item.label}
-        </a>
-      </li>
-    ))}
+    {
+      navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class={isActive(item.href) ? "nav-link active" : "nav-link"}
+            aria-current={isActive(item.href) ? "page" : undefined}
+          >
+            <span class="nav-icon">{item.emoji}</span>
+            <span class="nav-text">
+              {item.label.split(" ").slice(1).join(" ")}
+            </span>
+          </a>
+        </li>
+      ))
+    }
   </ul>
 </nav>
 
@@ -48,6 +53,9 @@ const isActive = (href: string) => {
     border-radius: 6px;
     transition: all 0.2s ease;
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .nav-link:hover {
@@ -63,7 +71,7 @@ const isActive = (href: string) => {
   }
 
   .nav-link.active::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -2px;
     left: 50%;
@@ -93,6 +101,16 @@ const isActive = (href: string) => {
 
   .nav-link.active::before {
     width: 0; /* Hide the hover effect for active links */
+  }
+
+  .nav-icon {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .nav-text {
+    font-size: inherit;
+    line-height: 1;
   }
 
   @media (max-width: 768px) {

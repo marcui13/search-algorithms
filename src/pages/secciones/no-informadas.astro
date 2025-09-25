@@ -166,7 +166,7 @@ const algorithms = getAlgorithmsByCategory('no-informadas');
     }
 
     .char-card {
-      background: white;
+      background: var(--color-card-bg);
       border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 1.5rem;
@@ -221,7 +221,7 @@ const algorithms = getAlgorithmsByCategory('no-informadas');
     .comparison-table {
       width: 100%;
       border-collapse: collapse;
-      background: white;
+      background: var(--color-card-bg);
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -262,13 +262,15 @@ const algorithms = getAlgorithmsByCategory('no-informadas');
     }
 
     .status.yes {
-      background: #dcfce7;
-      color: #166534;
+      background: var(--color-success);
+      color: white;
+      opacity: 0.9;
     }
 
     .status.no {
-      background: #fef3c7;
-      color: #92400e;
+      background: var(--color-warning);
+      color: white;
+      opacity: 0.9;
     }
 
     .complexity {

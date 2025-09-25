@@ -231,7 +231,7 @@ const section = categories.introduccion;
     }
 
     .definition-box {
-      background: #f8fafc;
+      background: var(--color-card-bg);
       border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 2rem;
@@ -243,6 +243,10 @@ const section = categories.introduccion;
       margin-bottom: 1rem;
     }
 
+    .definition-box p {
+      color: var(--color-text);
+    }
+
     .definition-box ul {
       list-style: none;
       padding: 0;
@@ -250,7 +254,8 @@ const section = categories.introduccion;
 
     .definition-box li {
       padding: 0.5rem 0;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
     }
 
     .definition-box li:last-child {
@@ -265,7 +270,7 @@ const section = categories.introduccion;
     }
 
     .component-card {
-      background: white;
+      background: var(--color-card-bg);
       border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 1.5rem;
@@ -291,7 +296,7 @@ const section = categories.introduccion;
     }
 
     .example {
-      background: #f1f5f9;
+      background: var(--color-code-bg);
       padding: 1rem;
       border-radius: 6px;
       font-size: 0.875rem;
@@ -347,7 +352,7 @@ const section = categories.introduccion;
     }
 
     .criteria-card {
-      background: white;
+      background: var(--color-card-bg);
       border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 1.5rem;
@@ -362,6 +367,7 @@ const section = categories.introduccion;
     .criteria-card p {
       font-size: 0.9rem;
       margin-bottom: 1rem;
+      color: var(--color-text-muted);
     }
 
     .criteria-levels {
@@ -388,7 +394,7 @@ const section = categories.introduccion;
     }
 
     .complexity-example {
-      background: #f3f4f6;
+      background: var(--color-code-bg);
       padding: 0.75rem;
       border-radius: 6px;
       font-family: var(--font-mono);
@@ -397,11 +403,12 @@ const section = categories.introduccion;
     }
 
     .next-steps {
-      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      background: var(--color-code-bg);
       padding: 3rem 2rem;
       border-radius: 12px;
       text-align: center;
       margin-top: 4rem;
+      border: 1px solid var(--color-border);
     }
 
     .next-steps h2 {
@@ -427,7 +434,7 @@ const section = categories.introduccion;
     }
 
     .nav-card {
-      background: white;
+      background: var(--color-card-bg);
       border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 2rem;
