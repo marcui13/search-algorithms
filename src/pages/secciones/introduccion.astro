@@ -1,12 +1,15 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import SectionHero from '../../components/SectionHero.astro';
-import { categories } from '../../data/algorithms';
+import Layout from "../../layouts/Layout.astro";
+import SectionHero from "../../components/SectionHero.astro";
+import { categories } from "../../data/algorithms";
 
 const section = categories.introduccion;
 ---
 
-<Layout title={`${section.title} - Search Algorithms`} description={section.description}>
+<Layout
+  title={`${section.title} - Search Algorithms`}
+  description={section.description}
+>
   <SectionHero
     title={section.title}
     subtitle={section.subtitle}
@@ -16,20 +19,31 @@ const section = categories.introduccion;
   <section class="content-section">
     <h2>¿Qué es un problema de búsqueda?</h2>
     <p>
-      Un problema de búsqueda es una clase de problemas computacionales donde el objetivo
-      es encontrar una secuencia de acciones que lleve desde un estado inicial hasta un
-      estado que satisfaga ciertos criterios (estado objetivo).
+      Un problema de búsqueda es una clase de problemas computacionales donde el
+      objetivo es encontrar una secuencia de acciones que lleve desde un estado
+      inicial hasta un estado que satisfaga ciertos criterios (estado objetivo).
     </p>
 
     <div class="definition-box">
       <h3>Definición Formal</h3>
       <p>Un problema de búsqueda se define por:</p>
       <ul>
-        <li><strong>Estado inicial:</strong> El punto de partida del problema</li>
-        <li><strong>Función de acciones:</strong> Las operaciones disponibles en cada estado</li>
-        <li><strong>Modelo de transición:</strong> Cómo cambia el estado con cada acción</li>
-        <li><strong>Test de objetivo:</strong> Determina si un estado es la solución</li>
-        <li><strong>Función de costo:</strong> Asigna un costo numérico a cada camino</li>
+        <li>
+          <strong>Estado inicial:</strong> El punto de partida del problema
+        </li>
+        <li>
+          <strong>Función de acciones:</strong> Las operaciones disponibles en cada
+          estado
+        </li>
+        <li>
+          <strong>Modelo de transición:</strong> Cómo cambia el estado con cada acción
+        </li>
+        <li>
+          <strong>Test de objetivo:</strong> Determina si un estado es la solución
+        </li>
+        <li>
+          <strong>Función de costo:</strong> Asigna un costo numérico a cada camino
+        </li>
       </ul>
     </div>
   </section>
@@ -45,20 +59,20 @@ const section = categories.introduccion;
           en un problema de navegación, sería la posición actual.
         </p>
         <div class="example">
-          <strong>Ejemplo:</strong> En el juego del 8-puzzle, el estado inicial
-          es la configuración inicial de las fichas.
+          <strong>Ejemplo:</strong> En el juego del 8-puzzle, el estado inicial es
+          la configuración inicial de las fichas.
         </div>
       </div>
 
       <div class="component-card">
         <h3>⚡ Acciones</h3>
         <p>
-          Las operaciones que el agente puede realizar en un estado dado.
-          Define el conjunto de movimientos legales.
+          Las operaciones que el agente puede realizar en un estado dado. Define
+          el conjunto de movimientos legales.
         </p>
         <div class="example">
-          <strong>Ejemplo:</strong> En el 8-puzzle, las acciones son mover
-          la ficha vacía arriba, abajo, izquierda o derecha.
+          <strong>Ejemplo:</strong> En el 8-puzzle, las acciones son mover la ficha
+          vacía arriba, abajo, izquierda o derecha.
         </div>
       </div>
 
@@ -77,12 +91,12 @@ const section = categories.introduccion;
       <div class="component-card">
         <h3>✅ Test de Objetivo</h3>
         <p>
-          Función que determina si un estado dado satisface los criterios
-          de solución del problema.
+          Función que determina si un estado dado satisface los criterios de
+          solución del problema.
         </p>
         <div class="example">
-          <strong>Ejemplo:</strong> En el 8-puzzle, verificar si las fichas
-          están en el orden: 1,2,3,4,5,6,7,8,vacío.
+          <strong>Ejemplo:</strong> En el 8-puzzle, verificar si las fichas están
+          en el orden: 1,2,3,4,5,6,7,8,vacío.
         </div>
       </div>
 
@@ -93,20 +107,20 @@ const section = categories.introduccion;
           soluciones y encontrar la óptima.
         </p>
         <div class="example">
-          <strong>Ejemplo:</strong> En navegación, podría ser la distancia
-          recorrida o el tiempo transcurrido.
+          <strong>Ejemplo:</strong> En navegación, podría ser la distancia recorrida
+          o el tiempo transcurrido.
         </div>
       </div>
 
       <div class="component-card">
         <h3>🧭 Espacio de Estados</h3>
         <p>
-          El conjunto de todos los estados posibles del problema, junto con
-          las acciones que los conectan.
+          El conjunto de todos los estados posibles del problema, junto con las
+          acciones que los conectan.
         </p>
         <div class="example">
-          <strong>Ejemplo:</strong> En el 8-puzzle, hay 9!/2 = 181,440
-          estados posibles alcanzables.
+          <strong>Ejemplo:</strong> En el 8-puzzle, hay 9!/2 = 181,440 estados posibles
+          alcanzables.
         </div>
       </div>
     </div>
@@ -119,26 +133,27 @@ const section = categories.introduccion;
       <div class="type-card tree-based">
         <h3>🌳 Búsqueda en Árbol</h3>
         <p>
-          Los algoritmos de búsqueda en árbol no mantienen registro de los estados
-          previamente visitados. Esto puede llevar a explorar el mismo estado múltiples veces.
+          Los algoritmos de búsqueda en árbol no mantienen registro de los
+          estados previamente visitados. Esto puede llevar a explorar el mismo
+          estado múltiples veces.
         </p>
         <ul>
-          <li>Menor uso de memoria</li>
-          <li>Posible redundancia en la exploración</li>
-          <li>Riesgo de bucles infinitos</li>
+          <li>Menor uso de memoria ✅</li>
+          <li>Posible redundancia en la exploración ❌</li>
+          <li>Riesgo de bucles infinitos ❌</li>
         </ul>
       </div>
 
       <div class="type-card graph-based">
         <h3>📊 Búsqueda en Grafo</h3>
         <p>
-          Los algoritmos de búsqueda en grafo mantienen un registro de los estados
-          explorados para evitar redundancia y bucles infinitos.
+          Los algoritmos de búsqueda en grafo mantienen un registro de los
+          estados explorados para evitar redundancia y bucles infinitos.
         </p>
         <ul>
-          <li>Mayor uso de memoria</li>
-          <li>Evita exploración redundante</li>
-          <li>Previene bucles infinitos</li>
+          <li>Mayor uso de memoria ❌</li>
+          <li>Evita exploración redundante ✅</li>
+          <li>Previene bucles infinitos ✅</li>
         </ul>
       </div>
     </div>
@@ -150,9 +165,7 @@ const section = categories.introduccion;
     <div class="criteria-grid">
       <div class="criteria-card">
         <h3>✨ Completitud</h3>
-        <p>
-          ¿El algoritmo garantiza encontrar una solución si existe una?
-        </p>
+        <p>¿El algoritmo garantiza encontrar una solución si existe una?</p>
         <div class="criteria-levels">
           <span class="complete">Completo</span>
           <span class="incomplete">No Completo</span>
@@ -161,9 +174,7 @@ const section = categories.introduccion;
 
       <div class="criteria-card">
         <h3>🎯 Optimalidad</h3>
-        <p>
-          ¿El algoritmo garantiza encontrar la solución de menor costo?
-        </p>
+        <p>¿El algoritmo garantiza encontrar la solución de menor costo?</p>
         <div class="criteria-levels">
           <span class="optimal">Óptimo</span>
           <span class="suboptimal">Subóptimo</span>
@@ -172,9 +183,7 @@ const section = categories.introduccion;
 
       <div class="criteria-card">
         <h3>⏱️ Complejidad Temporal</h3>
-        <p>
-          ¿Cuánto tiempo toma encontrar una solución?
-        </p>
+        <p>¿Cuánto tiempo toma encontrar una solución?</p>
         <div class="complexity-example">
           Ejemplo: O(b^d) donde b = factor de ramificación, d = profundidad
         </div>
@@ -182,9 +191,7 @@ const section = categories.introduccion;
 
       <div class="criteria-card">
         <h3>💾 Complejidad Espacial</h3>
-        <p>
-          ¿Cuánta memoria requiere el algoritmo durante la ejecución?
-        </p>
+        <p>¿Cuánta memoria requiere el algoritmo durante la ejecución?</p>
         <div class="complexity-example">
           Ejemplo: O(bd) para almacenar la frontera y el camino actual
         </div>
@@ -400,12 +407,14 @@ const section = categories.introduccion;
       font-weight: 500;
     }
 
-    .complete, .optimal {
+    .complete,
+    .optimal {
       background: #dcfce7;
       color: #166534;
     }
 
-    .incomplete, .suboptimal {
+    .incomplete,
+    .suboptimal {
       background: #fef3c7;
       color: #92400e;
     }

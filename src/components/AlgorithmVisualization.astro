@@ -62,6 +62,13 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
         <div class="current-step">
           <h4>Current Step:</h4>
           <p id="step-description">Click play to start the algorithm visualization</p>
+
+          <div class="visited-nodes">
+            <h5>Visited Nodes (in order):</h5>
+            <div id="visited-nodes-list" class="visited-list">
+              <span class="empty-state">No nodes visited yet</span>
+            </div>
+          </div>
         </div>
 
         <div class="metrics">
@@ -325,12 +332,14 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
 
           const queue = ['A'];
           const visited = new Set();
+          const visitedOrder = [];
 
           this.steps.push({
             action: 'start',
             node: 'A',
             description: 'Start BFS from root A',
-            frontier: []
+            frontier: [],
+            visitedNodes: []
           });
 
           while (queue.length > 0) {
@@ -338,13 +347,15 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
 
             if (visited.has(currentNode)) continue;
             visited.add(currentNode);
+            visitedOrder.push(currentNode);
 
             if (currentNode === goalNodeId) {
               this.steps.push({
                 action: 'goal',
                 node: currentNode,
                 description: `Found goal node ${currentNode}! BFS explores level by level.`,
-                frontier: queue.slice()
+                frontier: queue.slice(),
+                visitedNodes: visitedOrder.slice()
               });
               break;
             }
@@ -365,7 +376,8 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
               action: 'visit',
               node: currentNode,
               description: `Visit ${currentNode}, add children to queue: ${children.join(', ')}`,
-              frontier: queue.slice()
+              frontier: queue.slice(),
+              visitedNodes: visitedOrder.slice()
             });
           }
         }
@@ -376,12 +388,14 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
 
           const stack = ['A'];
           const visited = new Set();
+          const visitedOrder = [];
 
           this.steps.push({
             action: 'start',
             node: 'A',
             description: 'Start DFS from root A',
-            frontier: []
+            frontier: [],
+            visitedNodes: []
           });
 
           while (stack.length > 0) {
@@ -389,13 +403,15 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
 
             if (visited.has(currentNode)) continue;
             visited.add(currentNode);
+            visitedOrder.push(currentNode);
 
             if (currentNode === goalNodeId) {
               this.steps.push({
                 action: 'goal',
                 node: currentNode,
                 description: `Found goal node ${currentNode}! DFS goes deep quickly.`,
-                frontier: stack.slice()
+                frontier: stack.slice(),
+                visitedNodes: visitedOrder.slice()
               });
               break;
             }
@@ -417,7 +433,8 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
               action: 'visit',
               node: currentNode,
               description: `Visit ${currentNode}, add children to stack: ${children.reverse().join(', ')}`,
-              frontier: stack.slice()
+              frontier: stack.slice(),
+              visitedNodes: visitedOrder.slice()
             });
           }
         }
@@ -428,12 +445,14 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
 
           const priorityQueue = [{ node: 'A', cost: 0, path: ['A'] }];
           const visited = new Set();
+          const visitedOrder = [];
 
           this.steps.push({
             action: 'start',
             node: 'A',
             description: 'Start UCS from root A (cost: 0)',
-            frontier: []
+            frontier: [],
+            visitedNodes: []
           });
 
           while (priorityQueue.length > 0) {
@@ -443,13 +462,15 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
 
             if (visited.has(current.node)) continue;
             visited.add(current.node);
+            visitedOrder.push(current.node);
 
             if (current.node === goalNodeId) {
               this.steps.push({
                 action: 'goal',
                 node: current.node,
                 description: `Found goal ${current.node} with optimal cost ${current.cost}! UCS guarantees optimal solution.`,
-                frontier: priorityQueue.map(item => `${item.node}(${item.cost})`).slice(0, 5)
+                frontier: priorityQueue.map(item => `${item.node}(${item.cost})`).slice(0, 5),
+                visitedNodes: visitedOrder.slice()
               });
               break;
             }
@@ -477,7 +498,8 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
               action: 'visit',
               node: current.node,
               description: `Visit ${current.node} (cost: ${current.cost}), expand children with cumulative costs`,
-              frontier: priorityQueue.map(item => `${item.node}(${item.cost})`).slice(0, 5)
+              frontier: priorityQueue.map(item => `${item.node}(${item.cost})`).slice(0, 5),
+              visitedNodes: visitedOrder.slice()
             });
           }
         }
@@ -574,6 +596,10 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
           this.renderGraph();
           this.updateMetrics(0, 0, '-', 0, 0);
           document.getElementById('step-description').textContent = 'Click play to start the algorithm visualization';
+
+          // Reset visited nodes list
+          this.updateVisitedNodesList([], null);
+
           this.updateButtons();
         }
 
@@ -596,6 +622,9 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
 
           this.renderGraph();
           document.getElementById('step-description').textContent = step.description;
+
+          // Update visited nodes list
+          this.updateVisitedNodesList(step.visitedNodes || [], step.node);
 
           const visitedCount = this.nodes.filter(n => n.status === 'visited' || n.status === 'start').length;
           const frontierSize = step.frontier ? step.frontier.length : 0;
@@ -651,6 +680,45 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
               alertModal.remove();
             }
           }, 4000);
+        }
+
+        updateVisitedNodesList(visitedNodes, currentNode) {
+          const listContainer = document.getElementById('visited-nodes-list');
+          if (!listContainer) return;
+
+          // Clear existing content
+          listContainer.innerHTML = '';
+
+          if (!visitedNodes || visitedNodes.length === 0) {
+            const emptyState = document.createElement('span');
+            emptyState.className = 'empty-state';
+            emptyState.textContent = 'No nodes visited yet';
+            listContainer.appendChild(emptyState);
+            return;
+          }
+
+          // Add each visited node
+          visitedNodes.forEach((nodeId, index) => {
+            const nodeElement = document.createElement('span');
+            nodeElement.className = 'visited-node';
+            nodeElement.textContent = nodeId;
+
+            // Highlight the current node being processed
+            if (nodeId === currentNode) {
+              nodeElement.classList.add('current');
+            }
+
+            listContainer.appendChild(nodeElement);
+
+            // Add arrow between nodes (except after last one)
+            if (index < visitedNodes.length - 1) {
+              const arrow = document.createElement('span');
+              arrow.className = 'visit-arrow';
+              arrow.textContent = '→';
+              arrow.style.cssText = 'margin: 0 0.25rem; color: var(--color-text-muted); font-size: 0.75rem;';
+              listContainer.appendChild(arrow);
+            }
+          });
         }
 
         updateButtons() {
@@ -878,6 +946,61 @@ const showVisualization = supportedAlgorithms.includes(algorithmId);
     font-size: 0.875rem;
     line-height: 1.4;
     flex: 1;
+  }
+
+  .visited-nodes {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .visited-nodes h5 {
+    margin: 0 0 0.5rem 0;
+    color: var(--color-accent);
+    font-size: 0.875rem;
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  .visited-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    min-height: 1.5rem;
+    align-items: center;
+  }
+
+  .visited-list .empty-state {
+    color: var(--color-text-muted);
+    font-style: italic;
+    font-size: 0.75rem;
+  }
+
+  .visited-node {
+    background: var(--color-accent);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: var(--font-mono);
+    animation: slideIn 0.3s ease-out;
+  }
+
+  .visited-node.current {
+    background: var(--color-warning);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-10px) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
   }
 
   .metrics {
