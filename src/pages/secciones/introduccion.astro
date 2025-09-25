@@ -313,25 +313,37 @@ const section = categories.introduccion;
     .type-card {
       padding: 2rem;
       border-radius: 8px;
-      color: white;
+      background: var(--color-card-bg);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
     }
 
     .tree-based {
-      background: linear-gradient(135deg, #10b981, #059669);
+      border-left: 4px solid #10b981;
     }
 
     .graph-based {
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border-left: 4px solid #3b82f6;
     }
 
     .type-card h3 {
       margin-bottom: 1rem;
       font-size: 1.25rem;
+      color: var(--color-text);
+    }
+
+    .tree-based h3 {
+      color: #10b981;
+    }
+
+    .graph-based h3 {
+      color: #3b82f6;
     }
 
     .type-card p {
       margin-bottom: 1rem;
-      opacity: 0.9;
+      color: var(--color-text-muted);
+      line-height: 1.6;
     }
 
     .type-card ul {
@@ -340,8 +352,13 @@ const section = categories.introduccion;
     }
 
     .type-card li {
-      padding: 0.25rem 0;
-      opacity: 0.9;
+      padding: 0.5rem 0;
+      color: var(--color-text);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .type-card li:last-child {
+      border-bottom: none;
     }
 
     .criteria-grid {
